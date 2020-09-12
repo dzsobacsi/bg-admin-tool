@@ -1,0 +1,7 @@
+.Header {
+  display: flex;
+  background-color: green;
+  font-size: 32px;
+  font-weight: bold;
+  padding: 20px;
+}
