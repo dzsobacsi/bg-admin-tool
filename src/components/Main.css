@@ -14,3 +14,8 @@
 .box-2 {
   flex:2;
 }
+
+#grouplist {
+  height: 200px;
+  overflow: auto;
+}

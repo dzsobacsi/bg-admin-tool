@@ -1,12 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Header from './components/Header'
+import Notification from './components/Notification'
 import Main from './components/Main'
 
 function App() {
+  const [notifMessage, setNotifMessage] = useState('')
+
   return (
     <div>
       <Header/>
-      <Main/>
+      <Notification notifMessage={notifMessage} />
+      <Main setNotifMessage={setNotifMessage} />
     </div>
   )
 }

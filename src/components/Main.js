@@ -1,21 +1,37 @@
 import React, { useState, useEffect } from 'react'
 import Group from './Group'
-import dbService from '../services/queries'
+import NewGroupForm from './NewGroupForm'
+import dbService from '../services/services'
 import './Main.css'
 
-const Main = (props) => {
-  const [groups, setGroups] = useState(['test1', 'test2'])
+const Main = ({ setNotifMessage }) => {
+  const [groups, setGroups] = useState(['loading...'])
+  const [formVisible, setFormVisible] = useState(false)
 
   useEffect(() => {
-    console.log('useEffect started');
     dbService.getGroups().then(g => setGroups(g))
-  }, [])
+    setNotifMessage("Existing gropus are loaded")
+  }, [setNotifMessage])
+
+  const toggleFormVisible = () => {
+    setFormVisible(!formVisible)
+  }
 
   return (
     <div className="Main">
       <div className="box-1">
-        <b>Existing groups</b>
-        {groups.map(g => <Group key={g} gname={g}/>)}
+        {!formVisible &&
+          <div>
+            <button onClick={toggleFormVisible}>Add new group</button><br/>
+            <p><b>Existing groups</b></p>
+            <div id="grouplist">
+              {groups.map(g => <Group key={g} gname={g}/>)}
+            </div>
+          </div>
+        }
+        {formVisible &&
+          <NewGroupForm toggleFormVisible={toggleFormVisible}/>
+        }
       </div>
       <div className="box-2">
         something else

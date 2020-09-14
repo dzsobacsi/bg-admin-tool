@@ -1,8 +1,12 @@
 import React from 'react'
 
 const Group = ({ gname }) => {
+  const openGroupResults = () => {
+    console.log(`${gname} clicked`)
+  }
+
   return (
-    <p>{gname}</p>
+    <p onClick={openGroupResults}>{gname}</p>
   )
 }
 
