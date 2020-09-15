@@ -2,21 +2,31 @@ import React from 'react'
 import dbService from '../services/services'
 
 const NewGroupForm = ({ toggleFormVisible }) => {
-  const createNewForm = (e) => {
+  const createNewGroup = async (e) => {
     e.preventDefault()
+    const groupName = e.target.gpname.value
     const inputArray = document.getElementsByName('array')
     console.log([...inputArray].map(i => i.value).filter(i => i.length))
-    const idPromises = [...inputArray]
+
+    const playerIdPromises = [...inputArray]
       .map(inp => inp.value)
       .filter(i => i.length)
       .map(uname => dbService.getPlayerId(uname))
+    const playerIds = await Promise.all(playerIdPromises)
+    console.log(playerIds)
 
-    const playerIds = Promise.all(idPromises).then(r => console.log(r))
+    const matchIdPromises = playerIds
+      .map(pid => dbService.getMatchIds(pid, groupName))
+    const matchIds = await Promise
+      .all(matchIdPromises)
+      .then(resArray => resArray.map(x => x.matchIds).flat())  // flat is not supported in IE
+
+    console.log(matchIds)
   }
 
   return (
     <div className="NewGroupForm">
-      <form onSubmit={createNewForm}>
+      <form onSubmit={createNewGroup}>
         Group name: <input type="text" name="gpname"/><br/>
         Player 1:   <input type="text" name="array"/><br/>
         Player 2:   <input type="text" name="array"/><br/>

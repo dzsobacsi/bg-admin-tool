@@ -7,6 +7,7 @@ const cheerio = require('cheerio')
 const morgan = require('morgan')
 const pool = require('./db')
 const config = require('./config')
+const dgQueries = require('./src/services/dgQueries')
 const app = express()
 
 app.use(cors())
@@ -16,6 +17,14 @@ app.use(favicon(__dirname + '/build/favicon.ico'))
 // the __dirname is the current directory from where the script is running
 app.use(express.static(__dirname))
 app.use(express.static(path.join(__dirname, 'build')))
+
+// Temporary TESTs
+/*dgQueries.getPlayerIdFromDg('dzsobahgjcsi').
+  then(res => console.log(res))*/
+
+/*dgQueries.getMatchIdsFromDg(31952, '16th Championship League 2a')
+  .then(res => console.log(res))*/
+
 
 //ROUTES
 
@@ -53,7 +62,7 @@ app.post('/matches', async (req, res) => {
   }
 })
 
-//get all groups
+//get all groups from the database
 app.get('/groups', async (req, res) => {
   try {
     const groups = await pool.query('SELECT DISTINCT groupname FROM matches')
@@ -73,53 +82,37 @@ app.get('/players/:username', async (req, res) => {
       [req.params.username]
     )
     if (dbRespnse.rows.length) {
-      console.log('response sent from the database')
+      //console.log('response sent from the database')
       res.send(dbRespnse.rows[0].user_id.toString())
     }  else {
 
-      //If it is not in the database check it on dailygammon
-      const baseUrl = 'http://dailygammon.com'
-      const url = baseUrl + `/bg/plist?like=${req.params.username}&type=name`
-      const headers = {
-        Cookie: process.env.TESTCOOKIE
-      }
-      try {
-        const response = await axios({
-          method: 'post',
-          url,
-          headers
-        })
-        const $ = cheerio.load(response.data)
-        const userLink = $("[href^='/bg/user/']").attr('href')
-        if (userLink) {
-          const splittedLink = userLink.split("/")
-          const userId = splittedLink[splittedLink.length - 1]
+      //If it is not in the database, check it on dailygammon
+      const userId = await dgQueries.getPlayerIdFromDg(req.params.username)
 
-          // If found on dailygammon, save it to the database
-          try {
-            const newPlayer = await pool.query(
-              `INSERT INTO players (user_id, username)
-              VALUES ($1, $2)
-              RETURNING *`,
-              [userId, req.params.username]
-            )
-            console.log(`${JSON.stringify(newPlayer.rows[0])} is added to the database`)
-          } catch (e) {
-            console.error(e.message)
-            pool.end()
-          } finally {
-            console.log('response sent from dailygammon')
-            res.send(userId)
-          }
-        } else {
-          console.log(`no user: ${req.params.username}`)
-          res.send(`no user: ${req.params.username}`)
+      // If found on dailygammon, save it to the database
+      if (parseInt(userId)) {
+        try {
+          const newPlayer = await pool.query(
+            `INSERT INTO players (user_id, username)
+            VALUES ($1, $2)
+            RETURNING *`,
+            [userId, req.params.username]
+          )
+          console.log(`${JSON.stringify(newPlayer.rows[0])} is added to the database`)
+        } catch (e) {
+          console.error(`${req.params.username} could not be saved to database`)
+          console.error(e.message)
+          pool.end()
+        } finally {
+          //console.log('response sent from dailygammon')
+          res.send(userId)
         }
-      } catch (e) {
-        console.error(e.message);
+      } else {
+        res.send(userId)
       }
     }
   } catch (e) {
+    console.error('UserId could not be fetched from the database')
     console.error(e.message)
     pool.end()
   }
@@ -127,30 +120,13 @@ app.get('/players/:username', async (req, res) => {
 
 // get match IDs acc. to user id and event name
 app.get('/matches', async (req, res) => {
-  const { uid, event } = req.body
-  const baseUrl = 'http://dailygammon.com'
-  const url = baseUrl + `/bg/user/${uid}?sort_event=1&active=1&finished=1`
-  let matchIds = []
-  const headers = {
-    Cookie: process.env.TESTCOOKIE
-  }
-  try {
-    const response = await axios({
-      method: 'get',
-      url,
-      headers
-    })
-    const $ = cheerio.load(response.data)
-    $(`tr:contains('${event}')`)
-      .find('a:contains("Review")')
-      .each((i, e) => {
-        matchIds.push($(e).attr('href'))
-      })
-    matchIds = matchIds.map(x => x.split('/')[3])
-    console.log(matchIds)
+  console.log(req.query)
+  const { uid, event } = req.query
+  const matchIds = await dgQueries.getMatchIdsFromDg(uid, event)
+  if (Array.isArray(matchIds)) {
     res.json({ matchIds })
-  } catch (e) {
-    console.error(e.message);
+  } else {
+    res.send(matchIds)
   }
 })
 
