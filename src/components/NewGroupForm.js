@@ -5,23 +5,57 @@ const NewGroupForm = ({ toggleFormVisible }) => {
   const createNewGroup = async (e) => {
     e.preventDefault()
     const groupName = e.target.gpname.value
-    const inputArray = document.getElementsByName('array')
-    console.log([...inputArray].map(i => i.value).filter(i => i.length))
 
-    const playerIdPromises = [...inputArray]
+    //fetch player IDs
+    const inputArray = document.getElementsByName('array')
+    const userNames = [...inputArray]
       .map(inp => inp.value)
       .filter(i => i.length)
+    console.log(userNames)
+
+    const playerIdPromises = userNames
       .map(uname => dbService.getPlayerId(uname))
     const playerIds = await Promise.all(playerIdPromises)
     console.log(playerIds)
 
+    let players = {}
+    userNames.forEach((un, i) => players[un] = playerIds[i])
+    console.log(players)
+
+
+    //fetch match IDs
     const matchIdPromises = playerIds
       .map(pid => dbService.getMatchIds(pid, groupName))
-    const matchIds = await Promise
-      .all(matchIdPromises)
-      .then(resArray => resArray.map(x => x.matchIds).flat())  // flat is not supported in IE
-
+    let matchIds = await Promise.all(matchIdPromises)
+    matchIds = matchIds.map(x => x.matchIds).flat() // flat is not supported in IE
+    matchIds = [...new Set(matchIds)] // to remove duplicates
     console.log(matchIds)
+
+    //fetch match results
+    const matchResultPromises = matchIds
+      .map(mid => dbService.getMatchResult(mid))
+    let results = await Promise.all(matchResultPromises)
+    results = results.filter(
+      r => userNames.includes(r.players[0]) && userNames.includes(r.players[1])
+    )
+    console.log(results)
+        results = results.map(r => {
+      let newRes = {...r}
+      newRes.players = r.players.map(p => players[p])
+      return newRes
+    })
+    console.log(results)
+    if (results.length !== userNames.length * (userNames.length - 1)) {
+      console.warn('The number of matches does not fit to the number of players')
+      console.warn('Some matches are possilby not started yet')
+    }
+
+    //save match results to the database
+    const saveRequestPromises = results
+      .map(r => dbService.saveResultToDb(r, groupName))
+    const savedMatchResults = await Promise.all(saveRequestPromises)
+    console.log(savedMatchResults)
+    console.log('Match results are saved to the database')
   }
 
   return (

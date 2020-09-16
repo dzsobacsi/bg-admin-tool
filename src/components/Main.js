@@ -34,7 +34,7 @@ const Main = ({ setNotifMessage }) => {
         }
       </div>
       <div className="box-2">
-        something else
+        Select a group on the left
       </div>
     </div>
   )

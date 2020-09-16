@@ -37,4 +37,37 @@ const getMatchIds = async (uid, event) => {
   }
 }
 
-export default { getGroups, getPlayerId, getMatchIds }
+const getMatchResult = async mid => {
+  const url = baseUrl + `/matches/${mid}`
+  try {
+    const response = await axios.get(url)
+    return response.data
+  } catch (e) {
+    console.error('getMatchResult err')
+    console.error(e.message)
+  }
+}
+
+const saveResultToDb = async (mr, groupname) => {
+  const url = baseUrl + '/matches'
+  const data = {
+    match_id: mr.mid,
+    player1: mr.players[0],
+    player2: mr.players[1],
+    score1: mr.score[0],
+    score2: mr.score[1],
+    groupname,
+    finished: mr.finished
+  }
+  try {
+    const response = await axios.post(url, data)
+    return response.data
+  } catch (e) {
+    console.error('saveResultToDb err')
+    console.error(e.message)
+  }
+}
+
+export default {
+  getGroups, getPlayerId, getMatchIds, getMatchResult, saveResultToDb
+}

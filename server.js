@@ -2,12 +2,10 @@ const express = require('express')
 const favicon = require('express-favicon')
 const path = require('path')
 const cors = require('cors')
-const axios = require('axios')
-const cheerio = require('cheerio')
 const morgan = require('morgan')
 const pool = require('./db')
 const config = require('./config')
-const dgQueries = require('./src/services/dgQueries')
+const dgQueries = require('./dgQueries')
 const app = express()
 
 app.use(cors())
@@ -19,11 +17,13 @@ app.use(express.static(__dirname))
 app.use(express.static(path.join(__dirname, 'build')))
 
 // Temporary TESTs
-/*dgQueries.getPlayerIdFromDg('dzsobahgjcsi').
-  then(res => console.log(res))*/
+//dgQueries.getPlayerIdFromDg('dzsobacsi').then(res => console.log(res))
 
 /*dgQueries.getMatchIdsFromDg(31952, '16th Championship League 2a')
   .then(res => console.log(res))*/
+
+//dgQueries.getMatchResultFromDg(4310042).then(res => console.log(res))
+
 
 
 //ROUTES
@@ -120,7 +120,6 @@ app.get('/players/:username', async (req, res) => {
 
 // get match IDs acc. to user id and event name
 app.get('/matches', async (req, res) => {
-  console.log(req.query)
   const { uid, event } = req.query
   const matchIds = await dgQueries.getMatchIdsFromDg(uid, event)
   if (Array.isArray(matchIds)) {
@@ -128,6 +127,12 @@ app.get('/matches', async (req, res) => {
   } else {
     res.send(matchIds)
   }
+})
+
+//get match result acc. to match ID
+app.get('/matches/:id', async (req, res) => {
+  const result = await dgQueries.getMatchResultFromDg(req.params.id)
+  res.json(result)
 })
 
 app.get('/ping', (req, res) => {
