@@ -7,7 +7,7 @@ const baseUrl = process.env.NODE_ENV === 'development'
 
 const getGroups = async () => {
   try {
-    const response = await axios.get(baseUrl + '/groups')
+    const response = await axios.get(baseUrl + '/groups/groupnames')
     return response.data
   } catch (e) {
     console.error('getGroups err')
@@ -48,6 +48,17 @@ const getMatchResult = async mid => {
   }
 }
 
+const getGroupMatches = async groupname => {
+  const url = encodeUrl(baseUrl + `/groups/matches?groupname=${groupname}`)
+  try {
+    const response = await axios.get(url)
+    return response.data
+  } catch (e) {
+    console.error('getGroupMatches err')
+    console.error(e.message)
+  }
+}
+
 const saveResultToDb = async (mr, groupname) => {
   const url = baseUrl + '/matches'
   const data = {
@@ -69,5 +80,10 @@ const saveResultToDb = async (mr, groupname) => {
 }
 
 export default {
-  getGroups, getPlayerId, getMatchIds, getMatchResult, saveResultToDb
+  getGroups,
+  getPlayerId,
+  getMatchIds,
+  getMatchResult,
+  saveResultToDb,
+  getGroupMatches
 }

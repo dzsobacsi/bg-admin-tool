@@ -38,8 +38,9 @@ const NewGroupForm = ({ toggleFormVisible }) => {
     results = results.filter(
       r => userNames.includes(r.players[0]) && userNames.includes(r.players[1])
     )
-    console.log(results)
-        results = results.map(r => {
+
+    // This block replaces usernames with user IDs
+    results = results.map(r => {
       let newRes = {...r}
       newRes.players = r.players.map(p => players[p])
       return newRes
@@ -56,6 +57,13 @@ const NewGroupForm = ({ toggleFormVisible }) => {
     const savedMatchResults = await Promise.all(saveRequestPromises)
     console.log(savedMatchResults)
     console.log('Match results are saved to the database')
+
+    // TODO:
+    // - Do some checks before saving to the db
+    // - Ask for confirmation before save
+    // - Load results to app sate
+    // - Show results in a table on the right
+    // - Close the form
   }
 
   return (

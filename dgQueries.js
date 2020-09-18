@@ -105,7 +105,7 @@ const getMatchResultFromDg = async (mid) => {
       .text()
       .split(' ')
       .map(s => s.trim())
-      .filter(x => parseInt(x))
+      .filter(x => !isNaN(parseInt(x)))
       .map(x => parseInt(x))
     if (finished) {
       score[winner] = 11

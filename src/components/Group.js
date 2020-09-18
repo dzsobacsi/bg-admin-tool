@@ -1,8 +1,10 @@
 import React from 'react'
+import dbService from '../services/services'
 
 const Group = ({ gname }) => {
-  const openGroupResults = () => {
-    console.log(`${gname} clicked`)
+  const openGroupResults = async () => {
+    const matches = await dbService.getGroupMatches(gname)
+    console.log(matches)
   }
 
   return (

@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'build')))
 /*dgQueries.getMatchIdsFromDg(31952, '16th Championship League 2a')
   .then(res => console.log(res))*/
 
-//dgQueries.getMatchResultFromDg(4310042).then(res => console.log(res))
+dgQueries.getMatchResultFromDg(4311106).then(res => console.log(res))
 
 
 
@@ -62,11 +62,32 @@ app.post('/matches', async (req, res) => {
   }
 })
 
-//get all groups from the database
-app.get('/groups', async (req, res) => {
+//get all groupnames from the database
+app.get('/groups/groupnames', async (req, res) => {
   try {
     const groups = await pool.query('SELECT DISTINCT groupname FROM matches')
     res.json(groups.rows.map(x => x.groupname))
+  } catch (e) {
+    console.error(e.message)
+    pool.end()
+  }
+})
+
+//get matches of a given group from the database
+app.get('/groups/matches', async (req, res) => {
+  const group = req.query.groupname
+  try {
+    const matches = await pool.query(
+      `SELECT p1.username AS player1, p2.username AS player2, mt.score1, mt.score2, mt.finished
+      FROM matches AS mt
+      LEFT JOIN players p1
+      ON mt.player1 = p1.user_id
+      LEFT JOIN players p2
+      ON mt.player2 = p2.user_id
+      WHERE mt.groupname = $1`,
+      [group]
+    )
+    res.json(matches.rows)
   } catch (e) {
     console.error(e.message)
     pool.end()
@@ -118,7 +139,7 @@ app.get('/players/:username', async (req, res) => {
   }
 })
 
-// get match IDs acc. to user id and event name
+// get match IDs acc. to user id and event name from dailygammon
 app.get('/matches', async (req, res) => {
   const { uid, event } = req.query
   const matchIds = await dgQueries.getMatchIdsFromDg(uid, event)
@@ -129,7 +150,7 @@ app.get('/matches', async (req, res) => {
   }
 })
 
-//get match result acc. to match ID
+//get match result acc. to match ID from dailygammon
 app.get('/matches/:id', async (req, res) => {
   const result = await dgQueries.getMatchResultFromDg(req.params.id)
   res.json(result)
