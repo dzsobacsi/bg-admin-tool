@@ -9,8 +9,8 @@ function App() {
   return (
     <div>
       <Header/>
-      <Notification notifMessage={notifMessage} />
       <Main setNotifMessage={setNotifMessage} />
+      <Notification notifMessage={notifMessage} />
     </div>
   )
 }

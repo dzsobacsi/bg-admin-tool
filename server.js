@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'build')))
 /*dgQueries.getMatchIdsFromDg(31952, '16th Championship League 2a')
   .then(res => console.log(res))*/
 
-dgQueries.getMatchResultFromDg(4311106).then(res => console.log(res))
+//dgQueries.getMatchResultFromDg(4311106).then(res => console.log(res))
 
 
 

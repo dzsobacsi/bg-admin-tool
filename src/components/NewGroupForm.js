@@ -67,19 +67,23 @@ const NewGroupForm = ({ toggleFormVisible }) => {
   }
 
   return (
-    <div className="NewGroupForm">
+    <div className="new-group-form">
       <form onSubmit={createNewGroup}>
-        Group name: <input type="text" name="gpname"/><br/>
-        Player 1:   <input type="text" name="array"/><br/>
-        Player 2:   <input type="text" name="array"/><br/>
-        Player 3:   <input type="text" name="array"/><br/>
-        Player 4:   <input type="text" name="array"/><br/>
-        Player 5:   <input type="text" name="array"/><br/>
-        Player 6:   <input type="text" name="array"/><br/>
-        Player 7:   <input type="text" name="array"/><br/>
-        Player 8:   <input type="text" name="array"/><br/>
-        Player 9:   <input type="text" name="array"/><br/>
-        Player 10:  <input type="text" name="array"/><br/>
+        <table>
+          <tbody>
+            <tr><td>Group name: </td><td><input type="text" name="gpname"/></td></tr>
+            <tr><td>Player 1:   </td><td><input type="text" name="array"/></td></tr>
+            <tr><td>Player 2:   </td><td><input type="text" name="array"/></td></tr>
+            <tr><td>Player 3:   </td><td><input type="text" name="array"/></td></tr>
+            <tr><td>Player 4:   </td><td><input type="text" name="array"/></td></tr>
+            <tr><td>Player 5:   </td><td><input type="text" name="array"/></td></tr>
+            <tr><td>Player 6:   </td><td><input type="text" name="array"/></td></tr>
+            <tr><td>Player 7:   </td><td><input type="text" name="array"/></td></tr>
+            <tr><td>Player 8:   </td><td><input type="text" name="array"/></td></tr>
+            <tr><td>Player 9:   </td><td><input type="text" name="array"/></td></tr>
+            <tr><td>Player 10:  </td><td><input type="text" name="array"/></td></tr>
+          </tbody>
+        </table><br/>
         <button type="submit">add</button>
         <button onClick={toggleFormVisible}>cancel</button>
       </form>
