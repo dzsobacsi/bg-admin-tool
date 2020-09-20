@@ -46,7 +46,7 @@ const Summary = ({ matches }) => {
     <table className='summary-table'>
       <thead>
         <tr>
-          {['player', ...columns]
+          {['', ...columns]
             .map((c, i) => (<td key={i} className='t-header'>{c}</td>))}
         </tr>
       </thead>

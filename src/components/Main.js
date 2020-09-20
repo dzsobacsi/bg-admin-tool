@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Group from './Group'
 import NewGroupForm from './NewGroupForm'
+import NewMatchForm from './NewMatchForm'
 import Results from './Results'
 import Summary from './Summary'
 import dbService from '../services/services'
@@ -8,7 +9,7 @@ import './Main.css'
 
 const Main = ({ setNotifMessage }) => {
   const [groups, setGroups] = useState(['loading...'])
-  const [formVisible, setFormVisible] = useState(false)
+  const [formVisible, setFormVisible] = useState('')
   const [matches, setMatches] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
 
@@ -16,10 +17,6 @@ const Main = ({ setNotifMessage }) => {
     dbService.getGroups().then(g => setGroups(g))
     setNotifMessage("Existing gropus are loaded")
   }, [setNotifMessage])
-
-  const toggleFormVisible = () => {
-    setFormVisible(!formVisible)
-  }
 
   return (
     <div className="Main">
@@ -34,11 +31,15 @@ const Main = ({ setNotifMessage }) => {
                 setSelectedGroup={setSelectedGroup}/>)
               }
             </div><br/>
-            <button onClick={toggleFormVisible}>Add new group</button><br/>
+            <button onClick={() => setFormVisible('new-group')}>Add group</button>&nbsp;
+            <button onClick={() => setFormVisible('new-match')}>Add match</button>
           </div>
         }
-        {formVisible &&
-          <NewGroupForm toggleFormVisible={toggleFormVisible}/>
+        {formVisible === 'new-group' &&
+          <NewGroupForm setFormVisible={setFormVisible}/>
+        }
+        {formVisible === 'new-match' &&
+          <NewMatchForm setFormVisible={setFormVisible}/>
         }
       </div>
       <div className="box-2">

@@ -78,7 +78,7 @@ app.get('/groups/matches', async (req, res) => {
   const group = req.query.groupname
   try {
     const matches = await pool.query(
-      `SELECT p1.username AS player1, p2.username AS player2, mt.score1, mt.score2, mt.finished
+      `SELECT mt.match_id, p1.username AS player1, p2.username AS player2, mt.score1, mt.score2, mt.finished
       FROM matches AS mt
       LEFT JOIN players p1
       ON mt.player1 = p1.user_id

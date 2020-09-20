@@ -2,7 +2,7 @@ import React from 'react'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
-const NewGroupForm = ({ toggleFormVisible }) => {
+const NewGroupForm = ({ setFormVisible }) => {
   const createNewGroup = async (e) => {
     e.preventDefault()
     const groupName = e.target.gpname.value
@@ -22,7 +22,6 @@ const NewGroupForm = ({ toggleFormVisible }) => {
     let players = {}
     userNames.forEach((un, i) => players[un] = playerIds[i])
     console.log(players)
-
 
     //fetch match IDs
     const matchIdPromises = playerIds
@@ -53,16 +52,18 @@ const NewGroupForm = ({ toggleFormVisible }) => {
     }
 
     //save match results to the database
-    const saveRequestPromises = results
-      .map(r => dbService.saveResultToDb(r, groupName))
-    const savedMatchResults = await Promise.all(saveRequestPromises)
-    console.log(savedMatchResults)
-    console.log('Match results are saved to the database')
+    if (window.confirm('Do you want to save the results to the database?')) {
+      const saveRequestPromises = results
+        .map(r => dbService.saveResultToDb(r, groupName))
+      const savedMatchResults = await Promise.all(saveRequestPromises)
+      console.log(savedMatchResults)
+      console.log('Match results are saved to the database')
+    }
 
     // TODO:
     // - Do some checks before saving to the db
-    // - Ask for confirmation before save
     // - Load results to app sate
+    // - Add the newly added group name to the group state
     // - Show results in a table on the right
     // - Close the form
   }
@@ -79,8 +80,8 @@ const NewGroupForm = ({ toggleFormVisible }) => {
               <TextInput key={i} label={`Player ${i + 1}`} name='array'/>)}
           </tbody>
         </table><br/>
-        <button type="submit">add</button>
-        <button onClick={toggleFormVisible}>cancel</button>
+        <button type="submit">add</button>&nbsp;
+        <button onClick={() => setFormVisible('')}>cancel</button>
       </form>
     </div>
   )
