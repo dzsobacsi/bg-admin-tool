@@ -1,4 +1,5 @@
 import React from 'react'
+import TextInput from './TextInput'
 import dbService from '../services/services'
 
 const NewGroupForm = ({ toggleFormVisible }) => {
@@ -66,22 +67,16 @@ const NewGroupForm = ({ toggleFormVisible }) => {
     // - Close the form
   }
 
+  const textInputArray = new Array(10).fill()
+
   return (
     <div className="new-group-form">
       <form onSubmit={createNewGroup}>
         <table>
           <tbody>
-            <tr><td>Group name: </td><td><input type="text" name="gpname"/></td></tr>
-            <tr><td>Player 1:   </td><td><input type="text" name="array"/></td></tr>
-            <tr><td>Player 2:   </td><td><input type="text" name="array"/></td></tr>
-            <tr><td>Player 3:   </td><td><input type="text" name="array"/></td></tr>
-            <tr><td>Player 4:   </td><td><input type="text" name="array"/></td></tr>
-            <tr><td>Player 5:   </td><td><input type="text" name="array"/></td></tr>
-            <tr><td>Player 6:   </td><td><input type="text" name="array"/></td></tr>
-            <tr><td>Player 7:   </td><td><input type="text" name="array"/></td></tr>
-            <tr><td>Player 8:   </td><td><input type="text" name="array"/></td></tr>
-            <tr><td>Player 9:   </td><td><input type="text" name="array"/></td></tr>
-            <tr><td>Player 10:  </td><td><input type="text" name="array"/></td></tr>
+            <TextInput label='Group name' name='gpname'/>
+            {textInputArray.map((a, i) =>
+              <TextInput key={i} label={`Player ${i + 1}`} name='array'/>)}
           </tbody>
         </table><br/>
         <button type="submit">add</button>
