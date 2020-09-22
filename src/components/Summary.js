@@ -35,12 +35,12 @@ const Summary = ({ matches }) => {
   })
 
   let tableToRender = Object.values(summaryTable)
-    .sort((a, b) => b.won - a.won || b.sort - a.sort)
+    .sort((a, b) => b.won - a.won || b.total - a.total)
     .map(row => Object.values(row))
     .map(row => row.map(
       (data, i) => ({value: data, class: i ? 'default' : 't-header'})
     ))
-  console.log(tableToRender)
+  //console.log(tableToRender)
 
   return (
     <table className='summary-table'>

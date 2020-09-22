@@ -19,6 +19,70 @@ const Main = ({ setNotifMessage }) => {
     setNotifMessage("Existing gropus are loaded")
   }, [setNotifMessage])
 
+  const refreshResults = async () => {
+    //console.log(matches)
+    const unfinishedMatches = matches
+      .filter(m => !m.finished)
+      .map(m => m.match_id)
+
+    //fetch match results
+    const matchResultPromises = unfinishedMatches
+      .map(mid => dbService.getMatchResult(mid))
+    let results = await Promise.all(matchResultPromises)
+    results.forEach((r, i) => {
+      //console.log(r)
+      const currentMatch = matches.find(m => m.match_id === r.mid)
+      //console.log(currentMatch)
+      const playersInDb = [currentMatch.player1, currentMatch.player2]
+      const playersFromDg = r.players
+      if (JSON.stringify(playersInDb) !== JSON.stringify(playersFromDg)) {
+        console.warn(`I have reversed ${playersInDb[0]} and ${playersInDb[1]}`)
+        results[i].players = r.players.reverse()
+        results[i].score = r.score.reverse()
+      }
+      const updatedMatch = {
+        match_id: r.mid,
+        player1: r.players[0],
+        player2: r.players[1],
+        score1: r.score[0],
+        score2: r.score[1],
+        finished: r.finished
+      }
+
+      setMatches(matches.map(m => m.match_id === r.mid ? updatedMatch : m))
+    })
+
+    //TODO: This 2 blocks below have many redundancies with NewGroupForm
+    //      Cosider refactoring
+
+    // This block replaces usernames with user IDs
+    let playersSet = new Set()
+    results.forEach(m => {
+      playersSet.add(m.players[0])
+      playersSet.add(m.players[1])
+    })
+    const userNames = [...playersSet]
+    const playerIdPromises = userNames
+      .map(uname => dbService.getPlayerId(uname))
+    const playerIds = await Promise.all(playerIdPromises)
+
+    let players = {}
+    userNames.forEach((un, i) => players[un] = playerIds[i])
+
+    results = results.map((r, i) => {
+      let newRes = {...r}
+      newRes.players = r.players.map(p => players[p])
+      return newRes
+    })
+
+    // Save updated matches to the database
+    const saveRequestPromises = results
+      .map(r => dbService.saveResultToDb(r, selectedGroup))
+    const savedMatchResults = await Promise.all(saveRequestPromises)
+    console.log(savedMatchResults)
+    console.log('Match results are saved to the database')
+  }
+
   return (
     <div className="Main">
       <div className="box-1">
@@ -64,6 +128,11 @@ const Main = ({ setNotifMessage }) => {
         {matches.length > 0 && <h3>{selectedGroup}</h3>}
         {matches.length > 0 && <Summary matches={matches} />}
         {matches.length > 0 && <Results matches={matches} />}
+        {matches.length > 0 &&
+          <Button variant='success' onClick={refreshResults}>
+            Refresh results
+          </Button>
+        }
       </div>
     </div>
   )

@@ -6,7 +6,7 @@ const Group = ({ gname, setMatches, setSelectedGroup }) => {
     const matches = await dbService.getGroupMatches(gname)
     setSelectedGroup(gname)
     setMatches(matches)
-    console.log(matches)
+    //console.log(matches)
   }
 
   return (

@@ -2,6 +2,10 @@ import React from 'react'
 import TableRow from './TableRow'
 
 const Results = ({ matches }) => {
+  // matches come from the database and it has the keys:
+  // match_id, player1, player2, score1, score2, finished
+  // and players are strings with usernames
+
   //create an array of players
   let playersSet = new Set()
   matches.forEach(m => {

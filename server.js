@@ -52,6 +52,8 @@ app.post('/matches', async (req, res) => {
     const newMatch = await pool.query(
       `INSERT INTO matches (match_id, player1, player2, score1, score2, groupname, finished)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      ON CONFLICT (match_id) DO UPDATE
+      SET score1 = $4, score2 = $5, finished = $7
       RETURNING *`,
       [match_id, player1, player2, score1, score2, groupname, finished]
     )
