@@ -3,10 +3,11 @@ import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
-const NewMatchForm = ({ setFormVisible, setMatches }) => {
+const NewMatchForm = ({ setFormVisible, setMatches, groups }) => {
   const addNewMatch = async (e) => {
     e.preventDefault()
     const groupName = e.target.gpname.value
+    //console.log(groupName)
 
     let matchResult = await dbService.getMatchResult(e.target.mid.value)
     //console.log(matchResult)
@@ -37,7 +38,14 @@ to the database?`)) {
         <table>
           <tbody>
             <TextInput label='Match ID' name='mid'/>
-            <TextInput label='Group' name='gpname'/>
+            <tr>
+              <td>Group: </td>
+              <td>
+                <select name='gpname'>
+                  {groups.map((g, i) => (<option key={i} value={g}>{g}</option>))}
+                </select>
+              </td>
+            </tr>
           </tbody>
         </table><br/>
         <Button variant='outline-success' type="submit">add</Button>&nbsp;

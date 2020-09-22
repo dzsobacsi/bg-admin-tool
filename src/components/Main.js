@@ -120,6 +120,7 @@ const Main = ({ setNotifMessage }) => {
           <NewMatchForm
             setFormVisible={setFormVisible}
             setMatches={setMatches}
+            groups={groups}
           />
         }
       </div>
