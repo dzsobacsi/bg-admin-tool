@@ -2,7 +2,7 @@ import React from 'react'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
-const NewMatchForm = ({ setFormVisible }) => {
+const NewMatchForm = ({ setFormVisible, setMatches }) => {
   const addNewMatch = async (e) => {
     e.preventDefault()
     const groupName = e.target.gpname.value
@@ -22,6 +22,9 @@ const NewMatchForm = ({ setFormVisible }) => {
 ${JSON.stringify(matchResult)}
 to the database?`)) {
         const savedResult = await dbService.saveResultToDb(matchResult, groupName)
+
+        const matches = await dbService.getGroupMatches(groupName)
+        setMatches(matches)
         setFormVisible('')
         console.log(savedResult)
     }

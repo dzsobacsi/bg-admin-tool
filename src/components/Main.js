@@ -44,7 +44,10 @@ const Main = ({ setNotifMessage }) => {
           />
         }
         {formVisible === 'new-match' &&
-          <NewMatchForm setFormVisible={setFormVisible}/>
+          <NewMatchForm
+            setFormVisible={setFormVisible}
+            setMatches={setMatches}
+          />
         }
       </div>
       <div className="box-2">

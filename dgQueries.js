@@ -47,9 +47,9 @@ const getMatchIdsFromDg = async (uid, event) => {
       url,
       headers
     })
-    const $ = cheerio.load(response.data)
-    $(`tr:contains('${event}')`)
-      .find('a:contains("Review")')
+    const $ = cheerio.load(response.data.toLowerCase())
+    $(`tr:contains('${event.toLowerCase()}')`)
+      .find('a:contains("review")')
       .each((i, e) => {
         matchIds.push($(e).attr('href'))
       })
