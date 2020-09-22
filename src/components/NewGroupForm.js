@@ -73,7 +73,9 @@ also have another match with each other. Their order is replaced`)
       const savedMatchResults = await Promise.all(saveRequestPromises)
       console.log(savedMatchResults)
       console.log('Match results are saved to the database')
-      setMatches(savedMatchResults)
+      
+      const matches = await dbService.getGroupMatches(groupName)
+      setMatches(matches)
       setGroups([...groups, groupName])
       setFormVisible('')
     }

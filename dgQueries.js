@@ -103,9 +103,9 @@ const getMatchResultFromDg = async (mid) => {
     let score = $(`tr:contains("${players[0]}")`)
       .last()
       .text()
-      .split(' ')
-      .map(s => s.trim())
-      .filter(x => !isNaN(parseInt(x)))
+    score = [...score.matchAll(/: \d+/g)]
+      .map(s => s[0])
+      .map(s => s.slice(2))
       .map(x => parseInt(x))
     if (finished) {
       score[winner] = 11
