@@ -1,4 +1,5 @@
 import React from 'react'
+import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
@@ -73,7 +74,7 @@ also have another match with each other. Their order is replaced`)
       const savedMatchResults = await Promise.all(saveRequestPromises)
       console.log(savedMatchResults)
       console.log('Match results are saved to the database')
-      
+
       const matches = await dbService.getGroupMatches(groupName)
       setMatches(matches)
       setGroups([...groups, groupName])
@@ -93,8 +94,10 @@ also have another match with each other. Their order is replaced`)
               <TextInput key={i} label={`Player ${i + 1}`} name='array'/>)}
           </tbody>
         </table><br/>
-        <button type="submit">add</button>&nbsp;
-        <button onClick={() => setFormVisible('')}>cancel</button>
+        <Button variant='outline-success' type="submit">add</Button>&nbsp;
+        <Button variant='outline-secondary' onClick={() => setFormVisible('')}>
+          cancel
+        </Button>
       </form>
     </div>
   )

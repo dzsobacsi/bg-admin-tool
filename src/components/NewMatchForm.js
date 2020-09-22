@@ -1,4 +1,5 @@
 import React from 'react'
+import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
@@ -39,8 +40,10 @@ to the database?`)) {
             <TextInput label='Group' name='gpname'/>
           </tbody>
         </table><br/>
-        <button type="submit">add</button>&nbsp;
-        <button onClick={() => setFormVisible('')}>cancel</button>
+        <Button variant='outline-success' type="submit">add</Button>&nbsp;
+        <Button variant='outline-secondary' onClick={() => setFormVisible('')}>
+          cancel
+        </Button>
       </form>
     </div>
   )

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import Button from 'react-bootstrap/Button'
 import Group from './Group'
 import NewGroupForm from './NewGroupForm'
 import NewMatchForm from './NewMatchForm'
 import Results from './Results'
 import Summary from './Summary'
 import dbService from '../services/services'
-import './Main.css'
+
 
 const Main = ({ setNotifMessage }) => {
   const [groups, setGroups] = useState(['loading...'])
@@ -31,8 +32,16 @@ const Main = ({ setNotifMessage }) => {
                 setSelectedGroup={setSelectedGroup}/>)
               }
             </div><br/>
-            <button onClick={() => setFormVisible('new-group')}>Add group</button>&nbsp;
-            <button onClick={() => setFormVisible('new-match')}>Add match</button>
+            <Button
+              variant='outline-success'
+              onClick={() => setFormVisible('new-group')}>
+              Add group
+            </Button>&nbsp;
+            <Button
+              variant='outline-success'
+              onClick={() => setFormVisible('new-match')}>
+              Add match
+            </Button>
           </div>
         }
         {formVisible === 'new-group' &&
@@ -51,7 +60,7 @@ const Main = ({ setNotifMessage }) => {
         }
       </div>
       <div className="box-2">
-        {matches.length === 0 && <h4>Select a group on the left</h4>}
+        {matches.length === 0 && <h5><b>Select a group on the left</b></h5>}
         {matches.length > 0 && <h3>{selectedGroup}</h3>}
         {matches.length > 0 && <Summary matches={matches} />}
         {matches.length > 0 && <Results matches={matches} />}

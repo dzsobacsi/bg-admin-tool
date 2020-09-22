@@ -19,8 +19,8 @@ app.use(express.static(path.join(__dirname, 'build')))
 // Temporary TESTs
 //dgQueries.getPlayerIdFromDg('dzsobacsi').then(res => console.log(res))
 
-dgQueries.getMatchIdsFromDg(29189, '16th Championship League 2c')
-  .then(res => console.log(res))
+// dgQueries.getMatchIdsFromDg(29189, '16th Championship League 2c')
+//   .then(res => console.log(res))
 
 //dgQueries.getMatchResultFromDg(4309009).then(res => console.log(res))
 
