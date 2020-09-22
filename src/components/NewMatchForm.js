@@ -18,8 +18,13 @@ const NewMatchForm = ({ setFormVisible }) => {
     matchResult.players = playerIds
     //console.log(matchResult)
 
-    const savedResult = await dbService.saveResultToDb(matchResult, groupName)
-    console.log(savedResult)
+    if (window.confirm(`Do you want to save the match
+${JSON.stringify(matchResult)}
+to the database?`)) {
+        const savedResult = await dbService.saveResultToDb(matchResult, groupName)
+        setFormVisible('')
+        console.log(savedResult)
+    }
   }
 
   return (

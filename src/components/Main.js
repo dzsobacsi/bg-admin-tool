@@ -24,7 +24,7 @@ const Main = ({ setNotifMessage }) => {
         {!formVisible &&
           <div>
             <div id="grouplist">
-              {groups.map(g => <Group
+              {groups.sort().map(g => <Group
                 key={g}
                 gname={g}
                 setMatches={setMatches}
@@ -36,13 +36,19 @@ const Main = ({ setNotifMessage }) => {
           </div>
         }
         {formVisible === 'new-group' &&
-          <NewGroupForm setFormVisible={setFormVisible}/>
+          <NewGroupForm
+            setFormVisible={setFormVisible}
+            setMatches={setMatches}
+            groups={groups}
+            setGroups={setGroups}
+          />
         }
         {formVisible === 'new-match' &&
           <NewMatchForm setFormVisible={setFormVisible}/>
         }
       </div>
       <div className="box-2">
+        {matches.length === 0 && <h4>Select a group on the left</h4>}
         {matches.length > 0 && <h3>{selectedGroup}</h3>}
         {matches.length > 0 && <Summary matches={matches} />}
         {matches.length > 0 && <Results matches={matches} />}

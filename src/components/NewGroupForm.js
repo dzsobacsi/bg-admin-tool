@@ -2,7 +2,7 @@ import React from 'react'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
-const NewGroupForm = ({ setFormVisible }) => {
+const NewGroupForm = ({ setFormVisible, setMatches, groups, setGroups }) => {
   const createNewGroup = async (e) => {
     e.preventDefault()
     const groupName = e.target.gpname.value
@@ -46,10 +46,25 @@ const NewGroupForm = ({ setFormVisible }) => {
       return newRes
     })
     console.log(results)
+
+    //check if number of matches is n * (n - 1)
     if (results.length !== userNames.length * (userNames.length - 1)) {
-      console.warn('The number of matches does not fit to the number of players')
-      console.warn('Some matches are possilby not started yet')
+      console.warn(`The number of matches does not fit to the number of players
+Some matches are possilby not started yet`)
     }
+
+    //check for duplicates in the player arrays
+    let seen = []
+    results.forEach((r, i) => {
+      if (seen.includes(JSON.stringify(r.players))) {
+        console.warn(`The palyers of the match ${JSON.stringify(r)}
+also have another match with each other. Their order is replaced`)
+        results[i].players.reverse()
+        seen.push(JSON.stringify(r.players))
+      } else {
+        seen.push(JSON.stringify(r.players))
+      }
+    })
 
     //save match results to the database
     if (window.confirm('Do you want to save the results to the database?')) {
@@ -58,14 +73,10 @@ const NewGroupForm = ({ setFormVisible }) => {
       const savedMatchResults = await Promise.all(saveRequestPromises)
       console.log(savedMatchResults)
       console.log('Match results are saved to the database')
+      setMatches(savedMatchResults)
+      setGroups([...groups, groupName])
+      setFormVisible('')
     }
-
-    // TODO:
-    // - Do some checks before saving to the db
-    // - Load results to app sate
-    // - Add the newly added group name to the group state
-    // - Show results in a table on the right
-    // - Close the form
   }
 
   const textInputArray = new Array(10).fill()
