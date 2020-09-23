@@ -25,10 +25,14 @@ app.use(express.static(path.join(__dirname, 'build')))
 //dgQueries.getMatchResultFromDg(4309009).then(res => console.log(res))
 
 
+// TODO: Figure out the correct way to close the connection to the database
+
 
 //ROUTES
 
-//add a player
+// POST
+
+//add a player to the database
 app.post('/players', async (req, res) => {
   try {
     const { user_id, username } = req.body
@@ -45,7 +49,7 @@ app.post('/players', async (req, res) => {
   }
 })
 
-//add a match
+//add a match to the database
 app.post('/matches', async (req, res) => {
   try {
     const { match_id, player1, player2, score1, score2, groupname, finished } = req.body
@@ -63,6 +67,8 @@ app.post('/matches', async (req, res) => {
     pool.end()
   }
 })
+
+// GET
 
 //get all groupnames from the database
 app.get('/groups/groupnames', async (req, res) => {

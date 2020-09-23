@@ -16,7 +16,7 @@ const Main = ({ setNotifMessage }) => {
 
   useEffect(() => {
     dbService.getGroups().then(g => setGroups(g))
-    setNotifMessage("Existing gropus are loaded")
+    setNotifMessage("Ready")
   }, [setNotifMessage])
 
   const refreshResults = async () => {
@@ -114,6 +114,8 @@ const Main = ({ setNotifMessage }) => {
             setMatches={setMatches}
             groups={groups}
             setGroups={setGroups}
+            setSelectedGroup={setSelectedGroup}
+            setNotifMessage={setNotifMessage}
           />
         }
         {formVisible === 'new-match' &&
@@ -130,7 +132,7 @@ const Main = ({ setNotifMessage }) => {
         {matches.length > 0 && <Summary matches={matches} />}
         {matches.length > 0 && <Results matches={matches} />}
         {matches.length > 0 &&
-          <Button variant='success' onClick={refreshResults}>
+          <Button variant='outline-success' onClick={refreshResults}>
             Refresh results
           </Button>
         }

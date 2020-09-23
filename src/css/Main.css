@@ -12,11 +12,11 @@
 }
 
 .box-2 {
-  flex:2;
+  flex:2.2;
 }
 
 #grouplist {
-  height: 500px;
+  height: 535px;
   overflow: auto;
 }
 

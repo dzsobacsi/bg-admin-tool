@@ -3,9 +3,17 @@ import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
-const NewGroupForm = ({ setFormVisible, setMatches, groups, setGroups }) => {
+const NewGroupForm = ({
+  setFormVisible,
+  setMatches,
+  groups,
+  setGroups,
+  setSelectedGroup,
+  setNotifMessage
+}) => {
   const createNewGroup = async (e) => {
     e.preventDefault()
+    setNotifMessage('Please wait, this will take a little while...')
     const groupName = e.target.gpname.value
 
     //fetch player IDs
@@ -61,6 +69,7 @@ Some matches are possilby not started yet`)
         console.warn(`The palyers of the match ${JSON.stringify(r)}
 also have another match with each other. Their order is replaced`)
         results[i].players.reverse()
+        results[i].score.reverse()
         seen.push(JSON.stringify(r.players))
       } else {
         seen.push(JSON.stringify(r.players))
@@ -68,7 +77,8 @@ also have another match with each other. Their order is replaced`)
     })
 
     //save match results to the database
-    if (window.confirm('Do you want to save the results to the database?')) {
+    if (window.confirm(`${results.length} matches were found.
+Do you want to save the results to the database?`)) {
       const saveRequestPromises = results
         .map(r => dbService.saveResultToDb(r, groupName))
       const savedMatchResults = await Promise.all(saveRequestPromises)
@@ -78,7 +88,11 @@ also have another match with each other. Their order is replaced`)
       const matches = await dbService.getGroupMatches(groupName)
       setMatches(matches)
       setGroups([...groups, groupName])
+      setSelectedGroup(groupName)
       setFormVisible('')
+      setNotifMessage(`${results.length} matches were saved to the database`)
+    } else {
+      setNotifMessage('Ready')
     }
   }
 

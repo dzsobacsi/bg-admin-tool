@@ -4,7 +4,7 @@ import Notification from './components/Notification'
 import Main from './components/Main'
 
 function App() {
-  const [notifMessage, setNotifMessage] = useState('')
+  const [notifMessage, setNotifMessage] = useState('Loading...')
 
   return (
     <div>
