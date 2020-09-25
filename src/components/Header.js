@@ -1,10 +1,18 @@
 import React from 'react'
+import LoginForm from './LoginForm'
 
-const Header = (props) => {
+const Header = ({ adminMode, setAdminMode, setNotifMessage }) => {
   return (
     <div className="Header">
-      <div>
+      <div className="header-1">
         Backgammon Championship
+      </div>
+      <div className="header-3">
+        <LoginForm
+          adminMode={adminMode}
+          setAdminMode={setAdminMode}
+          setNotifMessage={setNotifMessage}
+        />
       </div>
     </div>
   )

@@ -1,15 +1,13 @@
 import axios from 'axios'
 
-const url = 'http://dailygammon.com/bg/login'
-const corsAnywhere = 'https://cors-anywhere.herokuapp.com/'
-const headers = {
-  //'Origin': 'http://dailygammon.com',
-  'X-Requested-With': 'XMLHttpRequest'
-}
+const baseUrl = process.env.NODE_ENV === 'development'
+  ? 'http://localhost:3000'
+  : ''
 
 const login = async (user) => {
+  const url = baseUrl + '/login'
   try {
-    const response = await axios.post(corsAnywhere+url, user, { headers })
+    const response = await axios.post(url, user)
     return response
   } catch (e) {
     console.error(e.message)

@@ -24,7 +24,8 @@ const NewGroupForm = ({
     console.log(userNames)
 
     const playerIdPromises = userNames
-      .map(uname => dbService.getPlayerId(uname))
+      .map(uname => dbService
+        .getPlayerId(uname, window.localStorage.getItem('login-cookie')))
     const playerIds = await Promise.all(playerIdPromises)
     console.log(playerIds)
 
@@ -34,7 +35,8 @@ const NewGroupForm = ({
 
     //fetch match IDs
     const matchIdPromises = playerIds
-      .map(pid => dbService.getMatchIds(pid, groupName))
+      .map(pid => dbService
+        .getMatchIds(pid, groupName, window.localStorage.getItem('login-cookie')))
     let matchIds = await Promise.all(matchIdPromises)
     matchIds = matchIds.map(x => x.matchIds).flat() // flat is not supported in IE
     matchIds = [...new Set(matchIds)] // to remove duplicates
@@ -42,7 +44,8 @@ const NewGroupForm = ({
 
     //fetch match results
     const matchResultPromises = matchIds
-      .map(mid => dbService.getMatchResult(mid))
+      .map(mid => dbService
+        .getMatchResult(mid, window.localStorage.getItem('login-cookie')))
     let results = await Promise.all(matchResultPromises)
     results = results.filter(
       r => userNames.includes(r.players[0]) && userNames.includes(r.players[1])
@@ -77,7 +80,8 @@ also have another match with each other. Their order is replaced`)
     })
 
     //save match results to the database
-    if (window.confirm(`${results.length} matches were found.
+    if (window.confirm(`${playerIds.length} out of ${userNames.length} users were found.
+${results.length} matches were found.
 Do you want to save the results to the database?`)) {
       const saveRequestPromises = results
         .map(r => dbService.saveResultToDb(r, groupName))

@@ -6,6 +6,7 @@ const morgan = require('morgan')
 const pool = require('./db')
 const config = require('./config')
 const dgQueries = require('./dgQueries')
+const dgLogin = require('./dgLogin')
 const app = express()
 
 app.use(cors())
@@ -68,6 +69,18 @@ app.post('/matches', async (req, res) => {
   }
 })
 
+//login
+app.post('/login', async (req, res) => {
+  const { login, password } = req.body
+  try {
+    const loginResponse = await dgLogin.login(login, password)
+    console.log(loginResponse)
+    res.json(loginResponse)
+  } catch (e) {
+    console.error(e.message)
+  }
+})
+
 // GET
 
 //get all groupnames from the database
@@ -104,6 +117,11 @@ app.get('/groups/matches', async (req, res) => {
 
 //get player ID
 app.get('/players/:username', async (req, res) => {
+  const { cookie } = req.query
+  const header = {
+    Cookie: cookie || config.TESTCOOKIE
+  }
+
   // Check if player is in the database
   try {
     const dbRespnse = await pool.query(
@@ -116,7 +134,7 @@ app.get('/players/:username', async (req, res) => {
     }  else {
 
       //If it is not in the database, check it on dailygammon
-      const userId = await dgQueries.getPlayerIdFromDg(req.params.username)
+      const userId = await dgQueries.getPlayerIdFromDg(req.params.username, header)
 
       // If found on dailygammon, save it to the database
       if (parseInt(userId)) {
@@ -149,8 +167,12 @@ app.get('/players/:username', async (req, res) => {
 
 // get match IDs acc. to user id and event name from dailygammon
 app.get('/matches', async (req, res) => {
-  const { uid, event } = req.query
-  const matchIds = await dgQueries.getMatchIdsFromDg(uid, event)
+  const { uid, event, cookie } = req.query
+  const header = {
+    Cookie: cookie || config.TESTCOOKIE
+  }
+
+  const matchIds = await dgQueries.getMatchIdsFromDg(uid, event, header)
   if (Array.isArray(matchIds)) {
     res.json({ matchIds })
   } else {
@@ -160,7 +182,12 @@ app.get('/matches', async (req, res) => {
 
 //get match result acc. to match ID from dailygammon
 app.get('/matches/:id', async (req, res) => {
-  const result = await dgQueries.getMatchResultFromDg(req.params.id)
+  const { cookie } = req.query
+  const header = {
+    Cookie: cookie || config.TESTCOOKIE
+  }
+
+  const result = await dgQueries.getMatchResultFromDg(req.params.id, header)
   res.json(result)
 })
 

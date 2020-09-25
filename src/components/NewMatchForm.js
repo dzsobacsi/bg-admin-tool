@@ -3,32 +3,35 @@ import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
-const NewMatchForm = ({ setFormVisible, setMatches, groups }) => {
+const NewMatchForm = ({ setFormVisible, setMatches, groups, setNotifMessage }) => {
+  setNotifMessage('Please wait...')
   const addNewMatch = async (e) => {
     e.preventDefault()
     const groupName = e.target.gpname.value
     //console.log(groupName)
 
-    let matchResult = await dbService.getMatchResult(e.target.mid.value)
+    let matchResult = await dbService.getMatchResult(
+        e.target.mid.value, window.localStorage.getItem('login-cookie')
+      )
     //console.log(matchResult)
 
     const playerIdPromises = matchResult.players
-      .map(uname => dbService.getPlayerId(uname))
+      .map(uname => dbService
+        .getPlayerId(uname, window.localStorage.getItem('login-cookie')))
     const playerIds = await Promise.all(playerIdPromises)
     //console.log(playerIds)
-
-    matchResult.players = playerIds
-    //console.log(matchResult)
 
     if (window.confirm(`Do you want to save the match
 ${JSON.stringify(matchResult)}
 to the database?`)) {
+        matchResult.players = playerIds
         const savedResult = await dbService.saveResultToDb(matchResult, groupName)
 
         const matches = await dbService.getGroupMatches(groupName)
         setMatches(matches)
         setFormVisible('')
         console.log(savedResult)
+        setNotifMessage('Match is saved to the database')
     }
   }
 

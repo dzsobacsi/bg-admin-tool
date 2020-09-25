@@ -5,11 +5,18 @@ import Main from './components/Main'
 
 function App() {
   const [notifMessage, setNotifMessage] = useState('Loading...')
+  const [adminMode, setAdminMode] = useState(
+    !!window.localStorage.getItem('login-cookie')
+  )
 
   return (
     <div>
-      <Header/>
-      <Main setNotifMessage={setNotifMessage} />
+      <Header
+        setNotifMessage={setNotifMessage}
+        adminMode={adminMode}
+        setAdminMode={setAdminMode}
+      />
+      <Main setNotifMessage={setNotifMessage} adminMode={adminMode}/>
       <Notification notifMessage={notifMessage} />
     </div>
   )

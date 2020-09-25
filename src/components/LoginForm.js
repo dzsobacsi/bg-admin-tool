@@ -1,7 +1,9 @@
 import React from 'react'
+import Form from 'react-bootstrap/Form'
+import Button from 'react-bootstrap/Button'
 import loginService from '../services/login'
 
-const LoginForm = () => {
+const LoginForm = ({ adminMode, setAdminMode, setNotifMessage }) => {
   const handleLogin = async (e) => {
     e.preventDefault()
     const user = {
@@ -9,17 +11,56 @@ const LoginForm = () => {
       password: e.target.password.value,
     }
     const loginResponse = await loginService.login(user)
-    console.log(loginResponse)
+    if (loginResponse.data) {
+      window.localStorage.setItem('login-cookie', loginResponse.data)
+      setAdminMode(!adminMode)
+      setNotifMessage('Successful login')
+    } else {
+      setNotifMessage('Wrong credentials')
+    }
+  }
+
+  const handleLogout = () => {
+    setAdminMode(!adminMode)
+    setNotifMessage('User logged out')
+    window.localStorage.clear()
   }
 
   return (
-    <div>
-      <form onSubmit={handleLogin}>
-        username: <input name="username" /><br/>
-        password: <input type="password" name="password"/><br/>
-        <button type="submit">login</button>
-      </form>
-    </div>
+    <>
+      {adminMode === false &&
+        <Form inline onSubmit={handleLogin}>
+          <Form.Control
+            className="smaller-form"
+            type="text"
+            placeholder="username"
+            name="username"
+          />&nbsp;
+          <Form.Control
+            className="smaller-form"
+            type="password"
+            placeholder="password"
+            name="password"
+          />&nbsp;
+          <Button
+            className="smaller-form"
+            variant="success"
+            size="sm"
+            type="submit">
+            Login
+          </Button>
+        </Form>
+      }
+      {adminMode === true &&
+        <Button
+          className="smaller-form"
+          variant="success"
+          size="sm"
+          onClick={handleLogout}>
+          Logout
+        </Button>
+      }
+    </>
   )
 }
 

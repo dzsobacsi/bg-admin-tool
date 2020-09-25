@@ -8,7 +8,7 @@ import Summary from './Summary'
 import dbService from '../services/services'
 
 
-const Main = ({ setNotifMessage }) => {
+const Main = ({ setNotifMessage, adminMode }) => {
   const [groups, setGroups] = useState(['loading...'])
   const [formVisible, setFormVisible] = useState('')
   const [matches, setMatches] = useState([])
@@ -20,17 +20,18 @@ const Main = ({ setNotifMessage }) => {
   }, [setNotifMessage])
 
   const refreshResults = async () => {
-    //console.log(matches)
+    const cookie = window.localStorage.getItem('login-cookie')
+    setNotifMessage('Please wait...')
     const unfinishedMatches = matches
       .filter(m => !m.finished)
       .map(m => m.match_id)
 
     //fetch match results
     const matchResultPromises = unfinishedMatches
-      .map(mid => dbService.getMatchResult(mid))
+      .map(mid => dbService.getMatchResult(mid, cookie))
     let results = await Promise.all(matchResultPromises)
     results.forEach((r, i) => {
-      //console.log(r)
+      console.log(r)
       const currentMatch = matches.find(m => m.match_id === r.mid)
       //console.log(currentMatch)
       const playersInDb = [currentMatch.player1, currentMatch.player2]
@@ -63,7 +64,7 @@ const Main = ({ setNotifMessage }) => {
     })
     const userNames = [...playersSet]
     const playerIdPromises = userNames
-      .map(uname => dbService.getPlayerId(uname))
+      .map(uname => dbService.getPlayerId(uname, cookie))
     const playerIds = await Promise.all(playerIdPromises)
 
     let players = {}
@@ -79,8 +80,11 @@ const Main = ({ setNotifMessage }) => {
     const saveRequestPromises = results
       .map(r => dbService.saveResultToDb(r, selectedGroup))
     const savedMatchResults = await Promise.all(saveRequestPromises)
-    console.log(savedMatchResults)
-    console.log('Match results are saved to the database')
+    //console.log(savedMatchResults)
+    setNotifMessage(
+      `Results are updated and ${savedMatchResults.length} matches are saved to the database`
+    )
+    //console.log('Match results are saved to the database')
   }
 
   return (
@@ -98,12 +102,14 @@ const Main = ({ setNotifMessage }) => {
             </div><br/>
             <Button
               variant='outline-success'
-              onClick={() => setFormVisible('new-group')}>
+              onClick={() => setFormVisible('new-group')}
+              disabled={!adminMode}>
               Add group
             </Button>&nbsp;
             <Button
               variant='outline-success'
-              onClick={() => setFormVisible('new-match')}>
+              onClick={() => setFormVisible('new-match')}
+              disabled={!adminMode}>
               Add match
             </Button>
           </div>
@@ -123,6 +129,7 @@ const Main = ({ setNotifMessage }) => {
             setFormVisible={setFormVisible}
             setMatches={setMatches}
             groups={groups}
+            setNotifMessage={setNotifMessage}
           />
         }
       </div>

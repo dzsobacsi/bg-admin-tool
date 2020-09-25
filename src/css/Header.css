@@ -1,7 +1,28 @@
 .Header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Header div {
+  border: 1px #ccc solid;
   background-color: #5cb85c;
+}
+
+.header-1 {
+  flex: 2;
   color: white;
   font-size: 32px;
   font-weight: bold;
   padding: 20px;
+}
+
+.header-3 {
+  flex: 1;
+  padding: 25px;
+}
+
+.smaller-form {
+  font-size: 12px;
+  padding: 6px;
+  float: right;
 }
