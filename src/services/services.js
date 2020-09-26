@@ -15,11 +15,8 @@ const getGroups = async () => {
   }
 }
 
-const getPlayerId = async (username, cookie) => {
+const getPlayerId = async (username) => {
   let url = encodeUrl(baseUrl + `/players/${username}`)
-  if (cookie) {
-    url += `?cookie=${cookie}`
-  }
   try {
     const response = await axios.get(url)
     return response.data
@@ -29,11 +26,8 @@ const getPlayerId = async (username, cookie) => {
   }
 }
 
-const getMatchIds = async (uid, event, cookie) => {
-  let url = encodeUrl(baseUrl + `/matches?uid=${uid}&event=${event}`)
-  if (cookie) {
-    url += `&cookie=${cookie}`
-  }
+const getMatchIds = async (uid, event) => {
+  let url = encodeUrl(baseUrl + `/matches/matchid?uid=${uid}&event=${event}`)
   try {
     const response = await axios.get(url)
     return response.data
@@ -43,11 +37,8 @@ const getMatchIds = async (uid, event, cookie) => {
   }
 }
 
-const getMatchResult = async (mid, cookie) => {
+const getMatchResult = async (mid) => {
   let url = baseUrl + `/matches/${mid}`
-  if (cookie) {
-    url += `?cookie=${cookie}`
-  }
   try {
     const response = await axios.get(url)
     return response.data

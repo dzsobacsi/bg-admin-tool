@@ -1,10 +1,14 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
 const encodeUrl = require('encodeurl')
+const config = require('../utils/config')
 
 const baseUrl = 'http://dailygammon.com'
+const header = {
+  Cookie: config.TESTCOOKIE
+}
 
-const getPlayerIdFromDg = async (username, header) => {
+const getPlayerIdFromDg = async (username) => {
   //console.log('getPlayerIdFromDg:', username, header)
   const url = encodeUrl(baseUrl + `/bg/plist?like=${username}&type=name`)
   try {
@@ -33,7 +37,7 @@ const getPlayerIdFromDg = async (username, header) => {
   }
 }
 
-const getMatchIdsFromDg = async (uid, event, header) => {
+const getMatchIdsFromDg = async (uid, event) => {
   //console.log('getMatchIdsFromDg:', uid, event, header)
   const url = encodeUrl(
     baseUrl + `/bg/user/${uid}?sort_event=1&active=1&finished=1`
@@ -63,7 +67,7 @@ const getMatchIdsFromDg = async (uid, event, header) => {
   }
 }
 
-const getMatchResultFromDg = async (mid, header) => {
+const getMatchResultFromDg = async (mid) => {
   //console.log('getMatchIdsFromDg:', mid, header)
   const url = baseUrl + `/bg/game/${mid}/0/list`
   try {
