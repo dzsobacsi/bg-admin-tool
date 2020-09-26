@@ -5,7 +5,7 @@ const encodeUrl = require('encodeurl')
 const baseUrl = 'http://dailygammon.com'
 
 const getPlayerIdFromDg = async (username, header) => {
-  console.log('getPlayerIdFromDg:', username, header)
+  //console.log('getPlayerIdFromDg:', username, header)
   const url = encodeUrl(baseUrl + `/bg/plist?like=${username}&type=name`)
   try {
     const response = await axios({
@@ -34,7 +34,7 @@ const getPlayerIdFromDg = async (username, header) => {
 }
 
 const getMatchIdsFromDg = async (uid, event, header) => {
-  console.log('getMatchIdsFromDg:', uid, event, header)
+  //console.log('getMatchIdsFromDg:', uid, event, header)
   const url = encodeUrl(
     baseUrl + `/bg/user/${uid}?sort_event=1&active=1&finished=1`
   )
@@ -64,7 +64,7 @@ const getMatchIdsFromDg = async (uid, event, header) => {
 }
 
 const getMatchResultFromDg = async (mid, header) => {
-  console.log('getMatchIdsFromDg:', mid, header)
+  //console.log('getMatchIdsFromDg:', mid, header)
   const url = baseUrl + `/bg/game/${mid}/0/list`
   try {
     const response = await axios({
