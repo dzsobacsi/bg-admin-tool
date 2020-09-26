@@ -63,9 +63,9 @@ const Summary = ({ matches }) => {
     <table className='summary-table'>
       <thead>
         <tr>
-          <td colspan="5"></td>
-          <td colspan="3"><b>all matches</b></td>
-          <td colspan="3"><b>finished matches</b></td>
+          <td colSpan="5"></td>
+          <td colSpan="3"><b>all matches</b></td>
+          <td colSpan="3"><b>finished matches</b></td>
         </tr>
         <tr>
           {['', ...columnLabels]

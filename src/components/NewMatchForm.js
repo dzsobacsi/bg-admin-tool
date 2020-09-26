@@ -3,7 +3,9 @@ import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
-const NewMatchForm = ({ setFormVisible, setMatches, groups, setNotifMessage }) => {
+const NewMatchForm = ({
+   setFormVisible, matches, setMatches, groups, setNotifMessage
+ }) => {
   setNotifMessage('Please wait...')
   const addNewMatch = async (e) => {
     e.preventDefault()
@@ -11,10 +13,22 @@ const NewMatchForm = ({ setFormVisible, setMatches, groups, setNotifMessage }) =
     //console.log(groupName)
 
     let matchResult = await dbService.getMatchResult(
-        e.target.mid.value, window.localStorage.getItem('login-cookie')
-      )
+      e.target.mid.value, window.localStorage.getItem('login-cookie')
+    )
+    //matchResult is an object with the following keys:
+    // mid, players[2], score[2], groupname, finished
     //console.log(matchResult)
 
+    // reverse the 2 players if they have a match already
+    if (matches.find(
+      m => JSON.stringify([m.player1, m.player2]) === JSON.stringify(matchResult.players))
+    ) {
+      matchResult.players = matchResult.players.reverse()
+      matchResult.score = matchResult.score.reverse()
+      console.warn('players are reversed')
+    }
+
+    // get the player IDs
     const playerIdPromises = matchResult.players
       .map(uname => dbService
         .getPlayerId(uname, window.localStorage.getItem('login-cookie')))
@@ -27,8 +41,8 @@ to the database?`)) {
         matchResult.players = playerIds
         const savedResult = await dbService.saveResultToDb(matchResult, groupName)
 
-        const matches = await dbService.getGroupMatches(groupName)
-        setMatches(matches)
+        const matchesFromDb = await dbService.getGroupMatches(groupName)
+        setMatches(matchesFromDb)
         setFormVisible('')
         console.log(savedResult)
         setNotifMessage('Match is saved to the database')

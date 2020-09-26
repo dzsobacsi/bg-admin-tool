@@ -31,7 +31,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
       .map(mid => dbService.getMatchResult(mid, cookie))
     let results = await Promise.all(matchResultPromises)
     results.forEach((r, i) => {
-      console.log(r)
+      //console.log(r)
       const currentMatch = matches.find(m => m.match_id === r.mid)
       //console.log(currentMatch)
       const playersInDb = [currentMatch.player1, currentMatch.player2]
@@ -127,6 +127,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
         {formVisible === 'new-match' &&
           <NewMatchForm
             setFormVisible={setFormVisible}
+            matches={matches}
             setMatches={setMatches}
             groups={groups}
             setNotifMessage={setNotifMessage}
