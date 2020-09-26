@@ -30,6 +30,14 @@ a:link, a:visited {
   color: black;
 }
 
+a:hover, a.ongoing:hover {
+  color: purple;
+}
+
+a.ongoing {
+  color: blue;
+}
+
 .results-table, .summary-table {
   border-collapse: collapse;
   margin: 10px;
@@ -45,10 +53,6 @@ a:link, a:visited {
 
 .t-header {
   font-weight: bold;
-}
-
-a.ongoing {
-  color: blue;
 }
 
 /*New Group Form*/
