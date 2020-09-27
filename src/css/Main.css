@@ -3,16 +3,19 @@
 }
 
 .Main div {
-  border: 1px #ccc solid;
+  /*border: 1px #ccc solid;*/
   padding: 10px;
 }
 
 .box-1 {
   flex:1;
+  border: 1px #5cb85c solid;
 }
 
 .box-2 {
   flex:2.2;
+  border-top: 1px #5cb85c solid;
+  border-bottom: 1px #5cb85c solid;
 }
 
 #grouplist {
