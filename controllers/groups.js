@@ -4,7 +4,7 @@ const pool = require('../utils/db')
 //get all groupnames from the database
 groupsRouter.get('/groupnames', async (req, res) => {
   try {
-    const groups = await pool.query('SELECT DISTINCT groupname FROM matches')
+    const groups = await pool.query('SELECT DISTINCT groupname FROM groups')
     res.json(groups.rows.map(x => x.groupname))
   } catch (e) {
     console.error(e.message)
@@ -23,7 +23,9 @@ groupsRouter.get('/matches', async (req, res) => {
       ON mt.player1 = p1.user_id
       LEFT JOIN players p2
       ON mt.player2 = p2.user_id
-      WHERE mt.groupname = $1`,
+      LEFT JOIN groups gp
+      ON mt.groupid = gp.groupid
+      WHERE gp.groupname = $1`,
       [group]
     )
     res.json(matches.rows)
