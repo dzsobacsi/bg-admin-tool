@@ -37,7 +37,7 @@ const Results = ({ matches }) => {
     matchResultsTable[pi[m.player1]][pi[m.player2]] = {
       value: `${m.score1} : ${m.score2}`,
       class: m.finished ? 'finished' : 'ongoing',
-      link: `http://dailygammon.com/bg/game/${m.match_id}/0/list`
+      link: `http://dailygammon.com/bg/game/${m.match_id}/0/list#end`
     }
   })
 
