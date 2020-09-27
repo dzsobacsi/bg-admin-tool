@@ -1,4 +1,5 @@
 const express = require('express')
+const favicon = require('express-favicon')
 const path = require('path')
 const cors = require('cors')
 const morgan = require('morgan')
@@ -13,6 +14,7 @@ const app = express()
 app.use(cors())
 app.use(morgan('tiny'))
 app.use(express.json())
+app.use(favicon(__dirname + '/build/favicon.ico'))
 // the __dirname is the current directory from where the script is running
 app.use(express.static(__dirname))
 app.use(express.static(path.join(__dirname, 'build')))
