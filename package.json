@@ -15,6 +15,7 @@
     "encodeurl": "^1.0.2",
     "express": "^4.17.1",
     "express-favicon": "^2.0.1",
+    "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
     "path": "^0.12.7",
     "pg": "^8.3.3",
