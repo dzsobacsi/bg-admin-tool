@@ -9,8 +9,10 @@ matchesRouter.post('/', async (req, res) => {
   try {
     const { match_id, player1, player2, score1, score2, groupname, finished } = req.body
     const newMatch = await pool.query(
-      `INSERT INTO matches (match_id, player1, player2, score1, score2, groupname, finished)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO matches (match_id, player1, player2, score1, score2, groupid, finished)
+      SELECT $1, $2, $3, $4, $5, gp.groupid, $7
+      FROM groups AS gp
+      WHERE gp.groupname = $6
       ON CONFLICT (match_id) DO UPDATE
       SET score1 = $4, score2 = $5, finished = $7
       RETURNING *`,
