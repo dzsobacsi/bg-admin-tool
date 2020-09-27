@@ -6,7 +6,7 @@ import Main from './components/Main'
 function App() {
   const [notifMessage, setNotifMessage] = useState('Loading...')
   const [adminMode, setAdminMode] = useState(
-    !!window.localStorage.getItem('login-cookie')
+    !!window.localStorage.getItem('token')
   )
 
   return (

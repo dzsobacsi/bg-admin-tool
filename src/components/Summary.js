@@ -52,7 +52,7 @@ const Summary = ({ matches }) => {
   })
 
   let tableToRender = Object.values(summaryTable)
-    .sort((a, b) => b.percwon - a.percwon || b.totall - a.totall || b.totfin - a.totfin)
+    .sort((a, b) => b.won - a.won || b.totall - a.totall || b.totfin - a.totfin)
     .map(row => Object.values(row))
     .map(row => row.map(
       (data, i) => ({value: data, class: i ? 'default' : 't-header'})

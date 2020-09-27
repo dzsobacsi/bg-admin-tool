@@ -6,6 +6,7 @@ const Group = ({ gname, setMatches, setSelectedGroup }) => {
     const matches = await dbService.getGroupMatches(gname)
     setSelectedGroup(gname)
     setMatches(matches)
+    window.localStorage.setItem("group", gname)
     //console.log(matches)
   }
 

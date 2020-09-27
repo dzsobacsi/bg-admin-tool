@@ -1,27 +1,35 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
+import RegisterForm from './RegisterForm'
 import loginService from '../services/login'
 
 const LoginForm = ({ adminMode, setAdminMode, setNotifMessage }) => {
+  const [registerVisble, setRegisterVisible] = useState(false)
+
+  const toggleRegisterVisible = () => setRegisterVisible(!registerVisble)
+
   const handleLogin = async (e) => {
     e.preventDefault()
     const user = {
-      login: e.target.username.value,
+      username: e.target.username.value,
       password: e.target.password.value,
     }
     const loginResponse = await loginService.login(user)
-    if (loginResponse.data) {
-      window.localStorage.setItem('login-cookie', loginResponse.data)
-      setAdminMode(!adminMode)
-      setNotifMessage('Successful login')
+    if (loginResponse) {
+      const user = loginResponse.data
+      window.localStorage.setItem('token', user.token)
+
+      setNotifMessage(`${user.username} logged in`)
+      setAdminMode(true)
     } else {
       setNotifMessage('Wrong credentials')
     }
   }
 
   const handleLogout = () => {
-    setAdminMode(!adminMode)
+    setAdminMode(false)
     setNotifMessage('User logged out')
     window.localStorage.clear()
   }
@@ -29,34 +37,63 @@ const LoginForm = ({ adminMode, setAdminMode, setNotifMessage }) => {
   return (
     <>
       {adminMode === false &&
-        <Form inline onSubmit={handleLogin}>
+        <><Form inline onSubmit={handleLogin}>
           <Form.Control
             className="smaller-form"
             type="text"
             placeholder="username"
             name="username"
           />&nbsp;
+
           <Form.Control
             className="smaller-form"
             type="password"
             placeholder="password"
             name="password"
           />&nbsp;
+
           <Button
             className="smaller-form"
             variant="success"
             size="sm"
-            type="submit">
+            type="submit"
+          >
             Login
+          </Button>&nbsp;
+
+          <Button
+            className="smaller-form"
+            variant="success"
+            size="sm"
+            onClick={toggleRegisterVisible}
+          >
+            Register
           </Button>
         </Form>
+
+        <Modal
+          show={registerVisble}
+          onHide={toggleRegisterVisible}
+          backdrop="static"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Register</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <RegisterForm
+              toggleRegisterVisible={toggleRegisterVisible}
+              setNotifMessage={setNotifMessage}
+            />
+          </Modal.Body>
+        </Modal></>
       }
       {adminMode === true &&
         <Button
           className="smaller-form"
           variant="success"
           size="sm"
-          onClick={handleLogout}>
+          onClick={handleLogout}
+        >
           Logout
         </Button>
       }
