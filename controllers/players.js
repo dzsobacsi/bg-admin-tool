@@ -1,14 +1,17 @@
 const playersRouter = require('express').Router()
 const dgQueries = require('./dgQueries')
-const pool = require('../utils/db')
+const Pool = require('pg-pool')
+const poolConfig = require('../utils/db')
 
 // TODO: Figure out the correct way to close the connection to the database
 
 //add a player to the database
 playersRouter.post('/', async (req, res) => {
+  const pool = new Pool(poolConfig)
+  const client = await pool.connect()
   try {
     const { user_id, username } = req.body
-    const newPlayer = await pool.query(
+    const newPlayer = await client.query(
       `INSERT INTO players (user_id, username)
       VALUES ($1, $2)
       RETURNING *`,
@@ -16,16 +19,20 @@ playersRouter.post('/', async (req, res) => {
     )
     res.json(newPlayer.rows[0])
   } catch (e) {
+    console.error('An error is catched in playersRouter.post')
     console.error(e.message)
-    pool.end()
+  } finally {
+    client.release()
   }
 })
 
 //get player ID
 playersRouter.get('/:username', async (req, res) => {
   // Check if player is in the database
+  const pool = new Pool(poolConfig)
+  const client = await pool.connect()
   try {
-    const dbRespnse = await pool.query(
+    const dbRespnse = await client.query(
       `SELECT user_id FROM players WHERE username = $1`,
       [req.params.username]
     )
@@ -40,7 +47,7 @@ playersRouter.get('/:username', async (req, res) => {
       // If found on dailygammon, save it to the database
       if (parseInt(userId)) {
         try {
-          const newPlayer = await pool.query(
+          const newPlayer = await client.query(
             `INSERT INTO players (user_id, username)
             VALUES ($1, $2)
             RETURNING *`,
@@ -60,9 +67,10 @@ playersRouter.get('/:username', async (req, res) => {
       }
     }
   } catch (e) {
-    console.error('UserId could not be fetched from the database')
+    console.error('An error is catched in playersRouter.get')
     console.error(e.message)
-    pool.end()
+  } finally {
+    client.release()
   }
 })
 

@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
-const pool = require('../utils/db')
+const Pool = require('pg-pool')
+const poolConfig = require('../utils/db')
 const usersRouter = require('express').Router()
 
 // add a user
@@ -12,8 +13,11 @@ usersRouter.post('/', async (req, res) => {
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(passwd, saltRounds)
 
+  const pool = new Pool(poolConfig)
+  const client = await pool.connect()
+
   try {
-    const newUser = await pool.query(
+    const newUser = await client.query(
       `INSERT INTO users (username, passwordhash)
       VALUES ($1, $2)
       RETURNING *`,
@@ -21,24 +25,30 @@ usersRouter.post('/', async (req, res) => {
     )
     res.json(newUser.rows[0])
   } catch (e) {
+    console.error('An error is catched in usersRouter.post')
     console.error(e.message)
-    pool.end()
+  } finally {
+    client.release()
   }
 
 })
 
 //get a user
 usersRouter.get('/:username', async (req, res) => {
+  const pool = new Pool(poolConfig)
+  const client = await pool.connect()
   try {
-    const user = await pool.query(
+    const user = await client.query(
       `SELECT * FROM users
       WHERE username = $1`,
       [req.params.username]
     )
     res.json(user.rows[0])
   } catch (e) {
+    console.error('An error is catched in usersRouter.get')
     console.error(e.message)
-    pool.end()
+  } finally {
+    client.release()
   }
 })
 

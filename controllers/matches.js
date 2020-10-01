@@ -1,14 +1,17 @@
 const matchesRouter = require('express').Router()
 const dgQueries = require('./dgQueries')
-const pool = require('../utils/db')
+const Pool = require('pg-pool')
+const poolConfig = require('../utils/db')
 
 // TODO: Figure out the correct way to close the connection to the database
 
 //add a match to the database
 matchesRouter.post('/', async (req, res) => {
+  const pool = new Pool(poolConfig)
+  const client = await pool.connect()
   try {
     const { match_id, player1, player2, score1, score2, groupname, finished } = req.body
-    const newMatch = await pool.query(
+    const newMatch = await client.query(
       `INSERT INTO matches (match_id, player1, player2, score1, score2, groupid, finished)
       SELECT $1, $2, $3, $4, $5, gp.groupid, $7
       FROM groups AS gp
@@ -20,8 +23,10 @@ matchesRouter.post('/', async (req, res) => {
     )
     res.json(newMatch.rows[0])
   } catch (e) {
+    console.error('An error is catched in matchesRouter.post')
     console.error(e.message)
-    pool.end()
+  } finally {
+    client.release()
   }
 })
 
