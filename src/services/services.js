@@ -79,11 +79,23 @@ const saveResultToDb = async (mr, groupname) => {
   }
 }
 
+const saveGroupToDb = async group => {
+  const url = baseUrl + '/groups'
+  try {
+    const response = await axios.post(url, group)
+    return response.data
+  } catch (e) {
+    console.error('saveNewGroupToDb err')
+    console.error(e.message)
+  }
+}
+
 export default {
   getGroups,
   getPlayerId,
   getMatchIds,
   getMatchResult,
   saveResultToDb,
-  getGroupMatches
+  getGroupMatches,
+  saveGroupToDb,
 }

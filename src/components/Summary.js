@@ -1,7 +1,7 @@
 import React from 'react'
 import TableRow from './TableRow'
 
-const Summary = ({ matches }) => {
+const Summary = ({ matches, setTopPlayer }) => {
   //create an array of players
   let playersSet = new Set()
   matches.forEach(m => {
@@ -23,6 +23,7 @@ const Summary = ({ matches }) => {
   let summaryTable = {}
   players.forEach(p => summaryTable[p] = { player: p, ...rowTemplate })
   matches.forEach(m => {
+    // Only if finihsed
     if (m.finished) {
       const winner = m.score1 === 11 ? 0 : 1
       const ply = [m.player1, m.player2]
@@ -58,6 +59,7 @@ const Summary = ({ matches }) => {
       (data, i) => ({value: data, class: i ? 'default' : 't-header'})
     ))
   //console.log(tableToRender)
+  setTopPlayer(tableToRender[0][0].value)
 
   return (
     <table className='summary-table'>

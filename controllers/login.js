@@ -6,8 +6,9 @@ const config = require('../utils/config')
 
 loginRouter.post('/', async (req, res) => {
   const { username, password } = req.body
+  const client = await pool.connect()
   try {
-    let user = await pool.query(
+    let user = await client.query(
       `SELECT * FROM users
       WHERE username = $1`,
       [username]
@@ -35,6 +36,8 @@ loginRouter.post('/', async (req, res) => {
   } catch (e) {
     console.error("Login router error")
     console.error(e.message)
+  } finally {
+    client.release()
   }
 })
 

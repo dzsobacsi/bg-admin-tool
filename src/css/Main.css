@@ -23,11 +23,24 @@
   overflow: auto;
 }
 
-#grouplist p {
+
+/*Tables*/
+.groups-table tbody tr td:first-child {
   cursor: pointer;
 }
 
-/*Tables*/
+.groups-table {
+  border-collapse: collapse;
+}
+
+.groups-table td {
+  border: 1px solid grey;
+  padding: 3px 7px;
+  text-align: center;
+  font-size: 14px;
+  color: black;
+}
+
 a:link, a:visited {
   text-decoration: none;
   color: black;

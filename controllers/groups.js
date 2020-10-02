@@ -1,14 +1,44 @@
 const groupsRouter = require('express').Router()
-const Pool = require('pg-pool')
-const poolConfig = require('../utils/db')
+const pool = require('../utils/db')
+
+// add a new group to the database
+groupsRouter.post('/', async (req, res) => {
+  const { groupname, finished, winner } = req.body
+  const client = await pool.connect()
+  try {
+    const groups = await client.query(
+      `INSERT INTO groups (groupname, finished, winner)
+        SELECT $1, $2, pl.user_id
+        FROM players AS pl
+        WHERE pl.username = $3
+      ON CONFLICT (groupname) DO UPDATE
+      SET finished = $2, winner = (
+        SELECT user_id
+        FROM players
+        WHERE username = $3
+      )
+      RETURNING *`,
+      [groupname, finished, winner]
+    )
+    res.json(groups.rows)
+  } catch (e) {
+    console.error('An error is catched in groupsRouter.post')
+    console.error(e.message)
+  } finally {
+    client.release()
+  }
+})
 
 //get all groupnames from the database
 groupsRouter.get('/groupnames', async (req, res) => {
-  const pool = new Pool(poolConfig)
   const client = await pool.connect()
   try {
-    const groups = await client.query('SELECT DISTINCT groupname FROM groups')
-    res.json(groups.rows.map(x => x.groupname))
+    const groups = await client.query(
+      `SELECT * FROM groups
+      LEFT JOIN players
+      ON groups.winner = players.user_id`
+    )
+    res.json(groups.rows)
   } catch (e) {
     console.error('An error is catched in groupsRouter.get/groupnames')
     console.error(e.message)
@@ -20,7 +50,6 @@ groupsRouter.get('/groupnames', async (req, res) => {
 //get matches of a given group from the database
 groupsRouter.get('/matches', async (req, res) => {
   const group = req.query.groupname
-  const pool = new Pool(poolConfig)
   const client = await pool.connect()
   try {
     const matches = await client.query(

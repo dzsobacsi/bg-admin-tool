@@ -1,17 +1,20 @@
 import React from 'react'
 import dbService from '../services/services'
 
-const Group = ({ gname, setMatches, setSelectedGroup }) => {
+const Group = ({ group, setMatches, setSelectedGroup }) => {
   const openGroupResults = async () => {
-    const matches = await dbService.getGroupMatches(gname)
-    setSelectedGroup(gname)
+    const matches = await dbService.getGroupMatches(group.groupname)
+    setSelectedGroup(group.groupname)
     setMatches(matches)
-    window.localStorage.setItem("group", gname)
+    //window.localStorage.setItem("group", group.groupname)
     //console.log(matches)
   }
 
   return (
-    <p onClick={openGroupResults}>{gname}</p>
+    <tr>
+      <td onClick={openGroupResults}>{group.groupname}</td>
+      <td>{group.finished ? group.username : 'ongoing'}</td>
+    </tr>
   )
 }
 

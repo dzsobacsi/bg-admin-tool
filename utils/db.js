@@ -1,6 +1,7 @@
+const Pool = require('pg').Pool
 const config = require('./config')
 
-const poolConfig = {
+const pool = new Pool({
   connectionString: config.DATABASE_URL,
   idleTimeoutMillis: 3000,
   connectionTimeoutMillis: 3000,
@@ -8,6 +9,6 @@ const poolConfig = {
   ssl: {
     rejectUnauthorized: false
   }
-}
+})
 
-module.exports = poolConfig
+module.exports = pool

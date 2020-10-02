@@ -9,10 +9,11 @@ import dbService from '../services/services'
 
 
 const Main = ({ setNotifMessage, adminMode }) => {
-  const [groups, setGroups] = useState(['loading...'])
+  const [groups, setGroups] = useState([])
   const [formVisible, setFormVisible] = useState('')
   const [matches, setMatches] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
+  const [topPlayer, setTopPlayer] = useState('')
 
   useEffect(() => {
     dbService.getGroups().then(g => setGroups(g))
@@ -20,7 +21,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
   }, [setNotifMessage])
 
   const refreshResults = async () => {
-    const cookie = window.localStorage.getItem('login-cookie')
+    //const cookie = window.localStorage.getItem('login-cookie')
     setNotifMessage('Please wait...')
     const unfinishedMatches = matches
       .filter(m => !m.finished)
@@ -28,12 +29,14 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
     //fetch match results
     const matchResultPromises = unfinishedMatches
-      .map(mid => dbService.getMatchResult(mid, cookie))
+      .map(mid => dbService.getMatchResult(mid))
     let results = await Promise.all(matchResultPromises)
     results.forEach((r, i) => {
       //console.log(r)
       const currentMatch = matches.find(m => m.match_id === r.mid)
-      //console.log(currentMatch)
+
+      // if players are stored in the database in reversed order,
+      // they have to be reveresed here again
       const playersInDb = [currentMatch.player1, currentMatch.player2]
       const playersFromDg = r.players
       if (JSON.stringify(playersInDb) !== JSON.stringify(playersFromDg)) {
@@ -64,7 +67,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
     })
     const userNames = [...playersSet]
     const playerIdPromises = userNames
-      .map(uname => dbService.getPlayerId(uname, cookie))
+      .map(uname => dbService.getPlayerId(uname))
     const playerIds = await Promise.all(playerIdPromises)
 
     let players = {}
@@ -85,6 +88,24 @@ const Main = ({ setNotifMessage, adminMode }) => {
       `Results are updated and ${savedMatchResults.length} matches are saved to the database`
     )
     //console.log('Match results are saved to the database')
+
+    // Check if all the matches are finished
+    // and update the group table if they are
+    const groupIsFinished = matches.every(m => m.finished)
+    if (groupIsFinished) {
+      const groupToUpdate = groups.find(g => g.groupname === selectedGroup)
+      const updatedGroup = {
+        ...groupToUpdate,
+        winner: topPlayer,
+        finished: true
+      }
+
+      await dbService.saveGroupToDb(updatedGroup)
+
+      setGroups(groups.map(g =>
+        g.groupname === selectedGroup ? updatedGroup : g
+      ))
+    }
   }
 
   return (
@@ -93,11 +114,26 @@ const Main = ({ setNotifMessage, adminMode }) => {
         {!formVisible &&
           <div>
             <div id="grouplist">
-              {groups.sort().map(g => <Group
-                key={g}
-                gname={g}
-                setMatches={setMatches}
-                setSelectedGroup={setSelectedGroup}/>)
+              { groups.length === 0 ? 'Loading...' :
+                <table className='groups-table'>
+                  <thead>
+                    <tr>
+                      <td><b>Group name</b></td>
+                      <td><b>Winner</b></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {groups
+                      .sort((a, b) => a.groupname.localeCompare(b.groupname))
+                      .map((g, i) => <Group
+                        key={i}
+                        group={g}
+                        setMatches={setMatches}
+                        setSelectedGroup={setSelectedGroup}
+                      />)
+                    }
+                  </tbody>
+                </table>
               }
             </div><br/>
             <Button
@@ -137,7 +173,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
       <div className="box-2">
         {matches.length === 0 && <h5><b>Select a group on the left</b></h5>}
         {matches.length > 0 && <h3>{selectedGroup}</h3>}
-        {matches.length > 0 && <Summary matches={matches} />}
+        {matches.length > 0 && <Summary matches={matches} setTopPlayer={setTopPlayer}/>}
         {matches.length > 0 && <Results matches={matches} />}
         {matches.length > 0 &&
           <Button variant='outline-success' onClick={refreshResults}>

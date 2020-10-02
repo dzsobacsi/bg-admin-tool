@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt')
-const Pool = require('pg-pool')
-const poolConfig = require('../utils/db')
+const pool = require('../utils/db')
 const usersRouter = require('express').Router()
 
 // add a user
@@ -13,7 +12,6 @@ usersRouter.post('/', async (req, res) => {
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(passwd, saltRounds)
 
-  const pool = new Pool(poolConfig)
   const client = await pool.connect()
 
   try {
@@ -35,7 +33,6 @@ usersRouter.post('/', async (req, res) => {
 
 //get a user
 usersRouter.get('/:username', async (req, res) => {
-  const pool = new Pool(poolConfig)
   const client = await pool.connect()
   try {
     const user = await client.query(
