@@ -21,8 +21,10 @@ const Main = ({ setNotifMessage, adminMode }) => {
   }, [setNotifMessage])
 
   const refreshResults = async () => {
-    //const cookie = window.localStorage.getItem('login-cookie')
     setNotifMessage('Please wait...')
+    let changedMatches = []
+
+    // match IDs of unfinised matches are collected
     const unfinishedMatches = matches
       .filter(m => !m.finished)
       .map(m => m.match_id)
@@ -30,30 +32,36 @@ const Main = ({ setNotifMessage, adminMode }) => {
     //fetch match results
     const matchResultPromises = unfinishedMatches
       .map(mid => dbService.getMatchResult(mid))
+
     let results = await Promise.all(matchResultPromises)
     results.forEach((r, i) => {
-      //console.log(r)
+      // currentMatch is taken from the match state
       const currentMatch = matches.find(m => m.match_id === r.mid)
 
-      // if players are stored in the database in reversed order,
-      // they have to be reveresed here again
-      const playersInDb = [currentMatch.player1, currentMatch.player2]
-      const playersFromDg = r.players
-      if (JSON.stringify(playersInDb) !== JSON.stringify(playersFromDg)) {
-        console.warn(`I have reversed ${playersInDb[0]} and ${playersInDb[1]}`)
-        results[i].players = r.players.reverse()
-        results[i].score = r.score.reverse()
-      }
-      const updatedMatch = {
-        match_id: r.mid,
-        player1: r.players[0],
-        player2: r.players[1],
-        score1: r.score[0],
-        score2: r.score[1],
-        finished: r.finished
-      }
+      // If the match result changed since last update
+      if (currentMatch.score1 !== r.score[0] || currentMatch.score2 !== r.score[1]) {
+        changedMatches.push(r.mid)
 
-      setMatches(matches.map(m => m.match_id === r.mid ? updatedMatch : m))
+        // if players are stored in the database in reversed order,
+        // they have to be reveresed here too
+        const playersInDb = [currentMatch.player1, currentMatch.player2]
+        const playersFromDg = r.players
+        if (JSON.stringify(playersInDb) !== JSON.stringify(playersFromDg)) {
+          console.warn(`I have reversed ${playersInDb[0]} and ${playersInDb[1]}`)
+          results[i].players = r.players.reverse()
+          results[i].score = r.score.reverse()
+        }
+
+        const updatedMatch = {
+          match_id: r.mid,
+          player1: r.players[0],
+          player2: r.players[1],
+          score1: r.score[0],
+          score2: r.score[1],
+          finished: r.finished
+        }
+        setMatches(matches.map(m => m.match_id === r.mid ? updatedMatch : m))
+      }
     })
 
     //TODO: This 2 blocks below have many redundancies with NewGroupForm
@@ -61,10 +69,14 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
     // This block replaces usernames with user IDs
     let playersSet = new Set()
+    results = results.filter(r => changedMatches.includes(r.mid))
+    console.log(results)
+
     results.forEach(m => {
       playersSet.add(m.players[0])
       playersSet.add(m.players[1])
     })
+
     const userNames = [...playersSet]
     const playerIdPromises = userNames
       .map(uname => dbService.getPlayerId(uname))
@@ -73,21 +85,21 @@ const Main = ({ setNotifMessage, adminMode }) => {
     let players = {}
     userNames.forEach((un, i) => players[un] = playerIds[i])
 
-    results = results.map((r, i) => {
-      let newRes = {...r}
-      newRes.players = r.players.map(p => players[p])
-      return newRes
-    })
+    // player names are replaced with their ids
+    results = results.map(r => ({
+      ...r,
+      players: r.players.map(p => players[p])
+    }))
 
     // Save updated matches to the database
     const saveRequestPromises = results
       .map(r => dbService.saveResultToDb(r, selectedGroup))
+
     const savedMatchResults = await Promise.all(saveRequestPromises)
-    //console.log(savedMatchResults)
+    console.log(savedMatchResults)
     setNotifMessage(
-      `Results are updated and ${savedMatchResults.length} matches are saved to the database`
+      `${savedMatchResults.length} matches were changed and saved to the database`
     )
-    //console.log('Match results are saved to the database')
 
     // Check if all the matches are finished
     // and update the group table if they are
