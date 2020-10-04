@@ -3,11 +3,13 @@ import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
 
+// groups = {groupname, groupid, finished, winner, user_id, username}
+
 const NewMatchForm = ({
    setFormVisible, matches, setMatches, groups, setNotifMessage
  }) => {
-  setNotifMessage('Please wait...')
   const addNewMatch = async (e) => {
+    setNotifMessage('Please wait...')
     e.preventDefault()
     const groupName = e.target.gpname.value
     //console.log(groupName)
@@ -59,7 +61,9 @@ to the database?`)) {
               <td>Group: </td>
               <td>
                 <select name='gpname'>
-                  {groups.map((g, i) => (<option key={i} value={g}>{g}</option>))}
+                  {groups.map((g, i) => (
+                    <option key={i} value={g.groupname}>{g.groupname}</option>
+                  ))}
                 </select>
               </td>
             </tr>

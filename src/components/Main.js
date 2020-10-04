@@ -98,7 +98,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
     const savedMatchResults = await Promise.all(saveRequestPromises)
     console.log(savedMatchResults)
     setNotifMessage(
-      `${savedMatchResults.length} matches were changed and saved to the database`
+      `${savedMatchResults.length} match${savedMatchResults.length > 1 ? 'es were' : ' was'} changed and saved to the database`
     )
 
     // Check if all the matches are finished
