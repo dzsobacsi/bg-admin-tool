@@ -15,6 +15,8 @@ const Main = ({ setNotifMessage, adminMode }) => {
   const [selectedGroup, setSelectedGroup] = useState('')
   const [topPlayer, setTopPlayer] = useState('')
 
+  // Groups are loaded from the server and notifmessage is set.
+  // Only once when the component is mounted
   useEffect(() => {
     dbService.getGroups().then(g => setGroups(g))
     setNotifMessage("Ready")
@@ -64,14 +66,12 @@ const Main = ({ setNotifMessage, adminMode }) => {
       }
     })
 
-    //TODO: This 2 blocks below have many redundancies with NewGroupForm
-    //      Cosider refactoring
+    // Unchanged matches are filtered out
+    results = results.filter(r => changedMatches.includes(r.mid))
+    //console.log(results)
 
     // This block replaces usernames with user IDs
     let playersSet = new Set()
-    results = results.filter(r => changedMatches.includes(r.mid))
-    console.log(results)
-
     results.forEach(m => {
       playersSet.add(m.players[0])
       playersSet.add(m.players[1])

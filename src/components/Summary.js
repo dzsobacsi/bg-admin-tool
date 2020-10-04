@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import TableRow from './TableRow'
 
 const Summary = ({ matches, setTopPlayer }) => {
+  useEffect(() => {
+    setTopPlayer(tableToRender[0][0].value)
+  })
+
   //create an array of players
   let playersSet = new Set()
   matches.forEach(m => {
@@ -58,8 +62,6 @@ const Summary = ({ matches, setTopPlayer }) => {
     .map(row => row.map(
       (data, i) => ({value: data, class: i ? 'default' : 't-header'})
     ))
-  //console.log(tableToRender)
-  setTopPlayer(tableToRender[0][0].value)
 
   return (
     <table className='summary-table'>

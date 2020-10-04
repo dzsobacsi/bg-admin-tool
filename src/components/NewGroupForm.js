@@ -57,9 +57,9 @@ const NewGroupForm = ({
     console.log(results)
 
     //check if number of matches is n * (n - 1)
-    if (results.length !== userNames.length * (userNames.length - 1)) {
-      console.warn(`The number of matches does not fit to the number of players
-Some matches are possilby not started yet`)
+    const expectedNrOfMatches = userNames.length * (userNames.length - 1)
+    if (results.length !== expectedNrOfMatches) {
+      console.warn(`The number of matches does not fit to the number of players`)
     }
 
     //check for duplicates in the player arrays
@@ -77,11 +77,13 @@ also have another match with each other. Their order is replaced`)
     })
 
     //save the group and the match results to the database
-    if (window.confirm(`${playerIds.length} out of ${userNames.length} users were found.
-${results.length} matches were found.
-Do you want to save the results to the database?`)) {
+    if (window.confirm(
+      `${playerIds.length} out of ${userNames.length} users were found.
+${results.length} out of ${expectedNrOfMatches} matches were found.
+Do you want to save the results to the database?`
+    )) {
       // save the new group to the database
-      const addedGroup = await dbService.saveGroupToDb(groupName)
+      const addedGroup = await dbService.saveGroupToDb({ groupname: groupName })
       console.log(addedGroup)
 
       // save the results to the database
@@ -93,7 +95,7 @@ Do you want to save the results to the database?`)) {
 
       const matches = await dbService.getGroupMatches(groupName)
       setMatches(matches)
-      setGroups([...groups, groupName])
+      setGroups([...groups, addedGroup])
       setSelectedGroup(groupName)
       setFormVisible('')
       setNotifMessage(`${results.length} matches were saved to the database`)

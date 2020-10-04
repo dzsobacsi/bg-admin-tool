@@ -4,13 +4,12 @@ const pool = require('../utils/db')
 // add a new group to the database
 groupsRouter.post('/', async (req, res) => {
   const { groupname, finished, winner } = req.body
+  //console.log({ groupname, finished, winner })
   const client = await pool.connect()
   try {
     const groups = await client.query(
-      `INSERT INTO groups (groupname, finished, winner)
-        SELECT $1, $2, pl.user_id
-        FROM players AS pl
-        WHERE pl.username = $3
+      `INSERT INTO groups (groupname)
+      VALUES ($1)
       ON CONFLICT (groupname) DO UPDATE
       SET finished = $2, winner = (
         SELECT user_id
@@ -18,9 +17,9 @@ groupsRouter.post('/', async (req, res) => {
         WHERE username = $3
       )
       RETURNING *`,
-      [groupname, finished, winner]
+      [groupname, finished || false, winner]
     )
-    res.json(groups.rows)
+    res.json(groups.rows[0])
   } catch (e) {
     console.error('An error is catched in groupsRouter.post')
     console.error(e.message)
