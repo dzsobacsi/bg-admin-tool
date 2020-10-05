@@ -25,6 +25,8 @@ const Main = ({ setNotifMessage, adminMode }) => {
   const refreshResults = async () => {
     setNotifMessage('Please wait...')
     let changedMatches = []
+    let nextStateMatches = [...matches]
+    let nextStateGroups = [...groups]
 
     // match IDs of unfinised matches are collected
     const unfinishedMatches = matches
@@ -62,13 +64,13 @@ const Main = ({ setNotifMessage, adminMode }) => {
           score2: r.score[1],
           finished: r.finished
         }
-        setMatches(matches.map(m => m.match_id === r.mid ? updatedMatch : m))
+        nextStateMatches = nextStateMatches
+          .map(m => m.match_id === r.mid ? updatedMatch : m)
       }
     })
 
     // Unchanged matches are filtered out
     results = results.filter(r => changedMatches.includes(r.mid))
-    //console.log(results)
 
     // This block replaces usernames with user IDs
     let playersSet = new Set()
@@ -85,7 +87,6 @@ const Main = ({ setNotifMessage, adminMode }) => {
     let players = {}
     userNames.forEach((un, i) => players[un] = playerIds[i])
 
-    // player names are replaced with their ids
     results = results.map(r => ({
       ...r,
       players: r.players.map(p => players[p])
@@ -96,15 +97,16 @@ const Main = ({ setNotifMessage, adminMode }) => {
       .map(r => dbService.saveResultToDb(r, selectedGroup))
 
     const savedMatchResults = await Promise.all(saveRequestPromises)
-    console.log(savedMatchResults)
+    console.log('saved results', savedMatchResults)
     setNotifMessage(
       `${savedMatchResults.length} match${savedMatchResults.length > 1 ? 'es were' : ' was'} changed and saved to the database`
     )
 
     // Check if all the matches are finished
     // and update the group table if they are
-    const groupIsFinished = matches.every(m => m.finished)
+    const groupIsFinished = nextStateMatches.every(m => m.finished)
     if (groupIsFinished) {
+      console.log('Group is finished!')
       const groupToUpdate = groups.find(g => g.groupname === selectedGroup)
       const updatedGroup = {
         ...groupToUpdate,
@@ -112,12 +114,15 @@ const Main = ({ setNotifMessage, adminMode }) => {
         finished: true
       }
 
-      await dbService.saveGroupToDb(updatedGroup)
+      const savedGroup = await dbService.saveGroupToDb(updatedGroup)
+      console.log('savedGroup', savedGroup)
 
-      setGroups(groups.map(g =>
-        g.groupname === selectedGroup ? updatedGroup : g
-      ))
+      nextStateGroups = nextStateGroups
+        .map(g => g.groupname === selectedGroup ? updatedGroup : g)
     }
+
+    setGroups(nextStateGroups)
+    setMatches(nextStateMatches)
   }
 
   return (
