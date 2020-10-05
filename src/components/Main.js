@@ -111,6 +111,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
       const updatedGroup = {
         ...groupToUpdate,
         winner: topPlayer,
+        username: topPlayer,
         finished: true
       }
 

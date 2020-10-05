@@ -13,7 +13,7 @@ const Group = ({ group, setMatches, setSelectedGroup }) => {
   return (
     <tr>
       <td onClick={openGroupResults}>{group.groupname}</td>
-      <td>{group.finished ? group.winner : 'ongoing'}</td>
+      <td>{group.finished ? group.username : 'ongoing'}</td>
     </tr>
   )
 }

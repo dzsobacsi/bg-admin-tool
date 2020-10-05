@@ -5,6 +5,7 @@ const pool = require('../utils/db')
 groupsRouter.post('/', async (req, res) => {
   const { groupname, finished, winner } = req.body
   //console.log({ groupname, finished, winner })
+  // winner is received as the name of the winner, but saved as its ID
   const client = await pool.connect()
   try {
     const groups = await client.query(
