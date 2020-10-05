@@ -19,7 +19,7 @@
 }
 
 #grouplist {
-  height: 535px;
+  height: 480px;
   overflow: auto;
 }
 
@@ -41,16 +41,16 @@
   color: black;
 }
 
-a:link, a:visited {
+td a:link, td a:visited {
   text-decoration: none;
   color: black;
 }
 
-a:hover, a.ongoing:hover {
+td a:hover, td a.ongoing:hover {
   color: purple;
 }
 
-a.ongoing {
+td a.ongoing {
   color: blue;
 }
 

@@ -71,6 +71,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
     // Unchanged matches are filtered out
     results = results.filter(r => changedMatches.includes(r.mid))
+    console.log('changed matches: ', results)
 
     // This block replaces usernames with user IDs
     let playersSet = new Set()

@@ -26,3 +26,8 @@
   padding: 6px;
   float: right;
 }
+
+#help {
+  text-decoration: none;
+  color: white;
+}
