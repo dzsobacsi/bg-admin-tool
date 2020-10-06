@@ -81,9 +81,20 @@ const Main = ({ setNotifMessage, adminMode }) => {
     })
 
     const userNames = [...playersSet]
+    if (userNames.some(un => typeof un === 'undefined')) {
+      console.error('Some usernames are undefined')
+      setNotifMessage('Could not find all matches or users.')
+      return
+    }
+
     const playerIdPromises = userNames
       .map(uname => dbService.getPlayerId(uname))
     const playerIds = await Promise.all(playerIdPromises)
+    if (playerIds.some(pid => typeof pid === 'undefined')) {
+      console.error('Some player IDs are undefined')
+      setNotifMessage('Could not find all matches or users.')
+      return
+    }
 
     let players = {}
     userNames.forEach((un, i) => players[un] = playerIds[i])
