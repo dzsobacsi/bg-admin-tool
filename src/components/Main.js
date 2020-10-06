@@ -16,6 +16,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
   const [selectedGroup, setSelectedGroup] = useState('')
   const [topPlayer, setTopPlayer] = useState('')
   const [groupFilter, setGroupFilter] = useState('')
+  const [updatedMatches, setUpdatedMatches] = useState([])
 
   // Groups are loaded from the server and notifmessage is set.
   // Only once when the component is mounted
@@ -138,6 +139,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
     setGroups(nextStateGroups)
     setMatches(nextStateMatches)
+    setUpdatedMatches(changedMatches)
   }
 
   const handleFilterChange = e => setGroupFilter(e.target.value)
@@ -149,7 +151,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
           <div>
             <div id="grouplist">
               { groups.length === 0 ? 'Loading...' :
-                <div>
+                <>
                   <Filter
                     groupFilter={groupFilter}
                     handleFilterChange={handleFilterChange}
@@ -157,10 +159,11 @@ const Main = ({ setNotifMessage, adminMode }) => {
                   <GroupTable
                     groups={groups}
                     setMatches={setMatches}
+                    setUpdatedMatches={setUpdatedMatches}
                     setSelectedGroup={setSelectedGroup}
                     groupFilter={groupFilter}
                   />
-                </div>
+                </>
               }
             </div><br/>
             <Button
@@ -199,13 +202,15 @@ const Main = ({ setNotifMessage, adminMode }) => {
       </div>
       <div className="box-2">
         {matches.length === 0 && <h5><b>Select a group on the left</b></h5>}
-        {matches.length > 0 && <h3>{selectedGroup}</h3>}
-        {matches.length > 0 && <Summary matches={matches} setTopPlayer={setTopPlayer}/>}
-        {matches.length > 0 && <Results matches={matches} />}
         {matches.length > 0 &&
-          <Button variant='outline-success' onClick={refreshResults}>
-            Refresh results
-          </Button>
+          <>
+            <h3>{selectedGroup}</h3>
+            <Summary matches={matches} setTopPlayer={setTopPlayer}/>
+            <Results matches={matches} updatedMatches={updatedMatches}/>
+            <Button variant='outline-success' onClick={refreshResults}>
+              Refresh results
+            </Button>
+          </>
         }
       </div>
     </div>

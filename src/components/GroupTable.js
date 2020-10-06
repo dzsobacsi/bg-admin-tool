@@ -1,7 +1,9 @@
 import React from 'react'
 import Group from './Group'
 
-const GroupTable = ({ groups, setMatches, setSelectedGroup, groupFilter }) => (
+const GroupTable = ({
+  groups, setMatches, setSelectedGroup, groupFilter, setUpdatedMatches
+}) => (
   <table className='groups-table'>
     <thead>
       <tr>
@@ -19,6 +21,7 @@ const GroupTable = ({ groups, setMatches, setSelectedGroup, groupFilter }) => (
           key={i}
           group={g}
           setMatches={setMatches}
+          setUpdatedMatches={setUpdatedMatches}
           setSelectedGroup={setSelectedGroup}
         />)
       }

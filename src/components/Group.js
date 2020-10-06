@@ -1,9 +1,10 @@
 import React from 'react'
 import dbService from '../services/services'
 
-const Group = ({ group, setMatches, setSelectedGroup }) => {
+const Group = ({ group, setMatches, setSelectedGroup, setUpdatedMatches }) => {
   const openGroupResults = async () => {
     const matches = await dbService.getGroupMatches(group.groupname)
+    setUpdatedMatches([])
     setSelectedGroup(group.groupname)
     setMatches(matches)
     //window.localStorage.setItem("group", group.groupname)

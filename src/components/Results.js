@@ -1,7 +1,7 @@
 import React from 'react'
 import TableRow from './TableRow'
 
-const Results = ({ matches }) => {
+const Results = ({ matches, updatedMatches }) => {
   // matches come from the database and it has the keys:
   // match_id, player1, player2, score1, score2, finished
   // and players are strings with usernames
@@ -37,6 +37,7 @@ const Results = ({ matches }) => {
     matchResultsTable[pi[m.player1]][pi[m.player2]] = {
       value: `${m.score1} : ${m.score2}`,
       class: m.finished ? 'finished' : 'ongoing',
+      mid: m.match_id,
       link: `http://dailygammon.com/bg/game/${m.match_id}/0/list#end`
     }
   })
@@ -44,7 +45,9 @@ const Results = ({ matches }) => {
   return (
     <table className='results-table'>
       <tbody>
-        {matchResultsTable.map((row, i) => <TableRow key={i} data={row}/>)}
+        {matchResultsTable.map((row, i) =>
+          <TableRow key={i} data={row} updatedMatches={updatedMatches}/>)
+        }
       </tbody>
     </table>
   )
