@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Button from 'react-bootstrap/Button'
-import Group from './Group'
+import GroupTable from './GroupTable'
 import NewGroupForm from './NewGroupForm'
 import NewMatchForm from './NewMatchForm'
 import Results from './Results'
@@ -154,26 +154,12 @@ const Main = ({ setNotifMessage, adminMode }) => {
                     groupFilter={groupFilter}
                     handleFilterChange={handleFilterChange}
                   />
-                  <table className='groups-table'>
-                    <thead>
-                      <tr>
-                        <td><b>Group name</b></td>
-                        <td><b>Winner</b></td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {groups
-                        .filter(g => g.groupname.toLowerCase().includes(groupFilter.toLowerCase()))
-                        .sort((a, b) => a.groupname.localeCompare(b.groupname))
-                        .map((g, i) => <Group
-                          key={i}
-                          group={g}
-                          setMatches={setMatches}
-                          setSelectedGroup={setSelectedGroup}
-                        />)
-                      }
-                    </tbody>
-                  </table>
+                  <GroupTable
+                    groups={groups}
+                    setMatches={setMatches}
+                    setSelectedGroup={setSelectedGroup}
+                    groupFilter={groupFilter}
+                  />
                 </div>
               }
             </div><br/>
