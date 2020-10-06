@@ -32,12 +32,12 @@ const NewMatchForm = ({
 
     // get the player IDs
     const playerIdPromises = matchResult.players
-      .map(uname => dbService
-        .getPlayerId(uname, window.localStorage.getItem('login-cookie')))
+      .map(uname => dbService.getPlayerId(uname))
+
     const playerIds = await Promise.all(playerIdPromises)
     //console.log(playerIds)
 
-    if (window.confirm(`Do you want to save the match
+    if (matchResult.players[0] && window.confirm(`Do you want to save the match
 ${JSON.stringify(matchResult)}
 to the database?`)) {
       matchResult.players = playerIds
@@ -48,6 +48,8 @@ to the database?`)) {
       setFormVisible('')
       console.log(savedResult)
       setNotifMessage('Match is saved to the database')
+    } else {
+      setNotifMessage('No match was found. Enter valid match ID.')
     }
   }
 

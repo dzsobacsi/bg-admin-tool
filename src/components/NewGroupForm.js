@@ -77,7 +77,7 @@ also have another match with each other. Their order is replaced`)
     })
 
     //save the group and the match results to the database
-    if (window.confirm(
+    if (results.length && window.confirm(
       `${playerIds.length} out of ${userNames.length} users were found.
 ${results.length} out of ${expectedNrOfMatches} matches were found.
 Do you want to save the results to the database?`
@@ -100,7 +100,7 @@ Do you want to save the results to the database?`
       setFormVisible('')
       setNotifMessage(`${results.length} matches were saved to the database`)
     } else {
-      setNotifMessage('Ready')
+      setNotifMessage('No matches were found. Enter valid group name and user names.')
     }
   }
 
