@@ -30,7 +30,7 @@ playersRouter.get('/:username', async (req, res) => {
   const client = await pool.connect()
   try {
     const dbRespnse = await client.query(
-      `SELECT user_id FROM players WHERE username = $1`,
+      'SELECT user_id FROM players WHERE username = $1',
       [req.params.username]
     )
     if (dbRespnse.rows.length) {

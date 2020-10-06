@@ -34,7 +34,7 @@ loginRouter.post('/', async (req, res) => {
 
     res.status(200).send({ token, username: user.username })
   } catch (e) {
-    console.error("Login router error")
+    console.error('Login router error')
     console.error(e.message)
   } finally {
     client.release()

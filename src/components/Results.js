@@ -13,7 +13,7 @@ const Results = ({ matches }) => {
     playersSet.add(m.player2)
   })
   let players = [...playersSet]
-   .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+    .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
 
   // Create a player-index object
   const tableSize = players.unshift('')
@@ -23,15 +23,15 @@ const Results = ({ matches }) => {
   // Create an empty 2D array
   let matchResultsTable = new Array(tableSize)
     .fill()
-    .map(a => new Array(tableSize).fill(''))
+    .map(() => new Array(tableSize).fill(''))
 
   // Fill the table with players name and with match results
   players.forEach((p, i) => {
-    matchResultsTable[0][i] = {value: p, class: 't-header'}
-    matchResultsTable[i][0] = {value: p, class: 't-header'}
+    matchResultsTable[0][i] = { value: p, class: 't-header' }
+    matchResultsTable[i][0] = { value: p, class: 't-header' }
   })
   for (let i = 1; i < tableSize; i++) {
-    matchResultsTable[i][i] = {value: '-----', class: 'diagonal'}
+    matchResultsTable[i][i] = { value: '-----', class: 'diagonal' }
   }
   matches.forEach(m => {
     matchResultsTable[pi[m.player1]][pi[m.player2]] = {

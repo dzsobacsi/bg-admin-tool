@@ -53,14 +53,14 @@ const Summary = ({ matches, setTopPlayer }) => {
   players.forEach(p => {
     summaryTable[p].percwon = summaryTable[p].fin
       ? Math.round(summaryTable[p].won / summaryTable[p].fin * 100)
-      : "N/A"
+      : '---'
   })
 
   let tableToRender = Object.values(summaryTable)
     .sort((a, b) => b.won - a.won || b.totall - a.totall || b.totfin - a.totfin)
     .map(row => Object.values(row))
     .map(row => row.map(
-      (data, i) => ({value: data, class: i ? 'default' : 't-header'})
+      (data, i) => ({ value: data, class: i ? 'default' : 't-header' })
     ))
 
   return (

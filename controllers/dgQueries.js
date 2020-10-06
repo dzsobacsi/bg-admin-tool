@@ -18,7 +18,7 @@ const getPlayerIdFromDg = async (username) => {
       headers: header
     })
     const $ = cheerio.load(response.data)
-    const userLinks = $("[href^='/bg/user/']")
+    const userLinks = $('[href^=\'/bg/user/\']')
     if (userLinks.length !== 1) {
       if (!userLinks.length) {
         return `There is no user: ${username}`
@@ -29,7 +29,7 @@ const getPlayerIdFromDg = async (username) => {
       }
     }
     const userLink = userLinks.attr('href')
-    const splittedLink = userLink.split("/")
+    const splittedLink = userLink.split('/')
     return splittedLink[splittedLink.length - 1]
   } catch (e) {
     console.error('Could not fetch player ID from dailygammon')

@@ -50,7 +50,7 @@ const NewGroupForm = ({
 
     // This block replaces usernames with user IDs
     results = results.map(r => {
-      let newRes = {...r}
+      let newRes = { ...r }
       newRes.players = r.players.map(p => players[p])
       return newRes
     })
@@ -59,7 +59,7 @@ const NewGroupForm = ({
     //check if number of matches is n * (n - 1)
     const expectedNrOfMatches = userNames.length * (userNames.length - 1)
     if (results.length !== expectedNrOfMatches) {
-      console.warn(`The number of matches does not fit to the number of players`)
+      console.warn('The number of matches does not fit to the number of players')
     }
 
     //check for duplicates in the player arrays

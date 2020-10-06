@@ -6,8 +6,8 @@ import dbService from '../services/services'
 // groups = {groupname, groupid, finished, winner, user_id, username}
 
 const NewMatchForm = ({
-   setFormVisible, matches, setMatches, groups, setNotifMessage
- }) => {
+  setFormVisible, matches, setMatches, groups, setNotifMessage
+}) => {
   const addNewMatch = async (e) => {
     setNotifMessage('Please wait...')
     e.preventDefault()
@@ -40,14 +40,14 @@ const NewMatchForm = ({
     if (window.confirm(`Do you want to save the match
 ${JSON.stringify(matchResult)}
 to the database?`)) {
-        matchResult.players = playerIds
-        const savedResult = await dbService.saveResultToDb(matchResult, groupName)
+      matchResult.players = playerIds
+      const savedResult = await dbService.saveResultToDb(matchResult, groupName)
 
-        const matchesFromDb = await dbService.getGroupMatches(groupName)
-        setMatches(matchesFromDb)
-        setFormVisible('')
-        console.log(savedResult)
-        setNotifMessage('Match is saved to the database')
+      const matchesFromDb = await dbService.getGroupMatches(groupName)
+      setMatches(matchesFromDb)
+      setFormVisible('')
+      console.log(savedResult)
+      setNotifMessage('Match is saved to the database')
     }
   }
 

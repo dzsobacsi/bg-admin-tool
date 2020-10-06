@@ -44,7 +44,7 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
 
   return (
     <Form onSubmit={handleRegister}>
-      <span style={{color: "red"}} display={warningText ? "inline" : "none"}>
+      <span style={{ color: 'red' }} display={warningText ? 'inline' : 'none'}>
         {warningText}
       </span>
       <Form.Group as={Row}>

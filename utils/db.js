@@ -3,11 +3,11 @@ const config = require('./config')
 
 const connection = process.env.NODE_ENV === 'development'
   ? {
-  user: 'postgres',
-  host: 'localhost',
-  database: 'bg_test',
-  password: config.LOCAL_DB_PASSWORD,
-  port: 5432,
+    user: 'postgres',
+    host: 'localhost',
+    database: 'bg_test',
+    password: config.LOCAL_DB_PASSWORD,
+    port: 5432,
   }
   : {
     connectionString: config.DATABASE_URL,

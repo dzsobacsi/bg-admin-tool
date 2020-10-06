@@ -19,7 +19,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
   // Only once when the component is mounted
   useEffect(() => {
     dbService.getGroups().then(g => setGroups(g))
-    setNotifMessage("Ready")
+    setNotifMessage('Ready')
   }, [setNotifMessage])
 
   const refreshResults = async () => {
