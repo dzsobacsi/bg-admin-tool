@@ -5,6 +5,7 @@ import NewGroupForm from './NewGroupForm'
 import NewMatchForm from './NewMatchForm'
 import Results from './Results'
 import Summary from './Summary'
+import Filter from './Filter'
 import dbService from '../services/services'
 
 
@@ -14,6 +15,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
   const [matches, setMatches] = useState([])
   const [selectedGroup, setSelectedGroup] = useState('')
   const [topPlayer, setTopPlayer] = useState('')
+  const [groupFilter, setGroupFilter] = useState('')
 
   // Groups are loaded from the server and notifmessage is set.
   // Only once when the component is mounted
@@ -138,6 +140,8 @@ const Main = ({ setNotifMessage, adminMode }) => {
     setMatches(nextStateMatches)
   }
 
+  const handleFilterChange = e => setGroupFilter(e.target.value)
+
   return (
     <div className="Main">
       <div className="box-1">
@@ -145,25 +149,32 @@ const Main = ({ setNotifMessage, adminMode }) => {
           <div>
             <div id="grouplist">
               { groups.length === 0 ? 'Loading...' :
-                <table className='groups-table'>
-                  <thead>
-                    <tr>
-                      <td><b>Group name</b></td>
-                      <td><b>Winner</b></td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {groups
-                      .sort((a, b) => a.groupname.localeCompare(b.groupname))
-                      .map((g, i) => <Group
-                        key={i}
-                        group={g}
-                        setMatches={setMatches}
-                        setSelectedGroup={setSelectedGroup}
-                      />)
-                    }
-                  </tbody>
-                </table>
+                <div>
+                  <Filter
+                    groupFilter={groupFilter}
+                    handleFilterChange={handleFilterChange}
+                  />
+                  <table className='groups-table'>
+                    <thead>
+                      <tr>
+                        <td><b>Group name</b></td>
+                        <td><b>Winner</b></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groups
+                        .filter(g => g.groupname.toLowerCase().includes(groupFilter.toLowerCase()))
+                        .sort((a, b) => a.groupname.localeCompare(b.groupname))
+                        .map((g, i) => <Group
+                          key={i}
+                          group={g}
+                          setMatches={setMatches}
+                          setSelectedGroup={setSelectedGroup}
+                        />)
+                      }
+                    </tbody>
+                  </table>
+                </div>
               }
             </div><br/>
             <Button
