@@ -27,16 +27,16 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
   const refreshResults = async () => {
     setNotifMessage('Please wait...')
-    let changedMatches = []
+    let changedMatches = [] // I could call this NextStateUpdatedMatches but it is shorter this way :)
     let nextStateMatches = [...matches]
     let nextStateGroups = [...groups]
 
-    // match IDs of unfinised matches are collected
+    // match IDs of unfinised matches are:
     const unfinishedMatches = matches
       .filter(m => !m.finished)
       .map(m => m.match_id)
 
-    //fetch match results
+    // fetch results of all the unfinised matches
     const matchResultPromises = unfinishedMatches
       .map(mid => dbService.getMatchResult(mid))
 
@@ -44,6 +44,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
     results.forEach((r, i) => {
       // currentMatch is taken from the match state
       const currentMatch = matches.find(m => m.match_id === r.mid)
+      let toReverse = false
 
       // If the match result changed since last update
       if (currentMatch.score1 !== r.score[0] || currentMatch.score2 !== r.score[1]) {
@@ -54,19 +55,25 @@ const Main = ({ setNotifMessage, adminMode }) => {
         const playersInDb = [currentMatch.player1, currentMatch.player2]
         const playersFromDg = r.players
         if (JSON.stringify(playersInDb) !== JSON.stringify(playersFromDg)) {
-          console.warn(`I have reversed ${playersInDb[0]} and ${playersInDb[1]}`)
-          results[i].players = r.players.reverse()
-          results[i].score = r.score.reverse()
+          console.warn(`I have to reverse ${playersInDb[0]} and ${playersInDb[1]}`)
+          toReverse = true
+          results[i].players.reverse()
+          results[i].score.reverse()
         }
 
         const updatedMatch = {
           match_id: r.mid,
-          player1: r.players[0],
-          player2: r.players[1],
-          score1: r.score[0],
-          score2: r.score[1],
+          player1: r.players[toReverse ? 1 : 0],
+          player2: r.players[toReverse ? 0 : 1],
+          score1: r.score[toReverse ? 1 : 0],
+          score2: r.score[toReverse ? 0 : 1],
           finished: r.finished
         }
+        console.log('result: ', r)
+        console.log('toReverse: ', toReverse)
+        console.log('updatedMatch: ', updatedMatch)
+        console.log('---------------------')
+
         nextStateMatches = nextStateMatches
           .map(m => m.match_id === r.mid ? updatedMatch : m)
       }
@@ -86,7 +93,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
     const userNames = [...playersSet]
     if (userNames.some(un => typeof un === 'undefined')) {
       console.error('Some usernames are undefined')
-      setNotifMessage('Could not find all matches or users.')
+      setNotifMessage('Something went wrong. Please, try again.')
       return
     }
 
@@ -95,7 +102,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
     const playerIds = await Promise.all(playerIdPromises)
     if (playerIds.some(pid => typeof pid === 'undefined')) {
       console.error('Some player IDs are undefined')
-      setNotifMessage('Could not find all matches or users.')
+      setNotifMessage('Something went wrong. Please, try again.')
       return
     }
 
@@ -114,7 +121,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
     const savedMatchResults = await Promise.all(saveRequestPromises)
     console.log('saved results', savedMatchResults)
     setNotifMessage(
-      `${savedMatchResults.length} match${savedMatchResults.length > 1 ? 'es were' : ' was'} changed and saved to the database`
+      `${savedMatchResults.length} match${savedMatchResults.length > 1 ? 'es were' : ' was'} changed and saved to the database.`
     )
 
     // Check if all the matches are finished
