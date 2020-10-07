@@ -2,8 +2,6 @@ const matchesRouter = require('express').Router()
 const dgQueries = require('./dgQueries')
 const pool = require('../utils/db')
 
-// TODO: Figure out the correct way to close the connection to the database
-
 //add a match to the database
 matchesRouter.post('/', async (req, res) => {
   const client = await pool.connect()
@@ -46,6 +44,7 @@ matchesRouter.get('/matchid', async (req, res) => {
 //get match result acc. to match ID from dailygammon
 matchesRouter.get('/:id', async (req, res) => {
   const result = await dgQueries.getMatchResultFromDg(req.params.id)
+  console.log('result from DG: ', result)
   res.json(result)
 })
 
