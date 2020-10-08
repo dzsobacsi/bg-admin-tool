@@ -54,9 +54,7 @@ playersRouter.get('/:username', async (req, res) => {
         } catch (e) {
           console.error(`${req.params.username} could not be saved to database`)
           console.error(e.message)
-          pool.end()
         } finally {
-          //console.log('response sent from dailygammon')
           res.send(userId)
         }
       } else {

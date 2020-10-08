@@ -63,10 +63,10 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
         const updatedMatch = {
           match_id: r.mid,
-          player1: r.players[toReverse ? 1 : 0],
-          player2: r.players[toReverse ? 0 : 1],
-          score1: r.score[toReverse ? 1 : 0],
-          score2: r.score[toReverse ? 0 : 1],
+          player1: r.players[0],
+          player2: r.players[1],
+          score1: r.score[0],
+          score2: r.score[1],
           finished: r.finished
         }
         console.log('result: ', r)
