@@ -17,6 +17,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
   const [topPlayer, setTopPlayer] = useState('')
   const [groupFilter, setGroupFilter] = useState('')
   const [updatedMatches, setUpdatedMatches] = useState([])
+  const [lastUpdate, setLastUpdate] = useState('')
 
   // Groups are loaded from the server and notifmessage is set.
   // Only once when the component is mounted
@@ -127,26 +128,34 @@ const Main = ({ setNotifMessage, adminMode }) => {
     // Check if all the matches are finished
     // and update the group table if they are
     const groupIsFinished = nextStateMatches.every(m => m.finished)
+    const groupToUpdate = groups.find(g => g.groupname === selectedGroup)
+    let updatedGroup
+
     if (groupIsFinished) {
       console.log('Group is finished!')
-      const groupToUpdate = groups.find(g => g.groupname === selectedGroup)
-      const updatedGroup = {
+      updatedGroup = {
         ...groupToUpdate,
         winner: topPlayer,
         username: topPlayer,
-        finished: true
+        finished: true,
+        date: Math.floor(Date.now() / 1000)
       }
-
-      const savedGroup = await dbService.saveGroupToDb(updatedGroup)
-      console.log('savedGroup', savedGroup)
-
-      nextStateGroups = nextStateGroups
-        .map(g => g.groupname === selectedGroup ? updatedGroup : g)
+    } else {
+      updatedGroup = {
+        ...groupToUpdate,
+        date: Math.floor(Date.now() / 1000)
+      }
     }
+    const savedGroup = await dbService.saveGroupToDb(updatedGroup)
+    console.log('savedGroup', savedGroup)
+
+    nextStateGroups = nextStateGroups
+      .map(g => g.groupname === selectedGroup ? updatedGroup : g)
 
     setGroups(nextStateGroups)
     setMatches(nextStateMatches)
     setUpdatedMatches(changedMatches)
+    setLastUpdate(new Date().toString())
   }
 
   const handleFilterChange = e => setGroupFilter(e.target.value)
@@ -168,6 +177,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
                     setMatches={setMatches}
                     setUpdatedMatches={setUpdatedMatches}
                     setSelectedGroup={setSelectedGroup}
+                    setLastUpdate={setLastUpdate}
                     groupFilter={groupFilter}
                   />
                 </>
@@ -194,6 +204,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
             groups={groups}
             setGroups={setGroups}
             setSelectedGroup={setSelectedGroup}
+            setLastUpdate={setLastUpdate}
             setNotifMessage={setNotifMessage}
           />
         }
@@ -214,6 +225,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
             <h3>{selectedGroup}</h3>
             <Summary matches={matches} setTopPlayer={setTopPlayer}/>
             <Results matches={matches} updatedMatches={updatedMatches}/>
+            <span id="lastupdate">Last update: {lastUpdate}</span><br/>
             <Button variant='outline-success' onClick={refreshResults}>
               Refresh results
             </Button>

@@ -9,6 +9,7 @@ const NewGroupForm = ({
   groups,
   setGroups,
   setSelectedGroup,
+  setLastUpdate,
   setNotifMessage
 }) => {
   const createNewGroup = async (e) => {
@@ -83,7 +84,12 @@ ${results.length} out of ${expectedNrOfMatches} matches were found.
 Do you want to save the results to the database?`
     )) {
       // save the new group to the database
-      const addedGroup = await dbService.saveGroupToDb({ groupname: groupName })
+      const groupToSave = {
+        groupname: groupName,
+        season: parseInt(groupName.slice(0, 2)), // This maybe necessary to updated if we use different group names in the future
+        date: Math.floor(Date.now() / 1000)
+      }
+      const addedGroup = await dbService.saveGroupToDb(groupToSave)
       console.log(addedGroup)
 
       // save the results to the database
@@ -98,6 +104,7 @@ Do you want to save the results to the database?`
       setGroups([...groups, addedGroup])
       setSelectedGroup(groupName)
       setFormVisible('')
+      setLastUpdate(new Date().toString())
       setNotifMessage(`${results.length} matches were saved to the database`)
     } else {
       setNotifMessage('No matches were found. Enter valid group name and user names.')

@@ -3,22 +3,22 @@ const pool = require('../utils/db')
 
 // add a new group to the database
 groupsRouter.post('/', async (req, res) => {
-  const { groupname, finished, winner } = req.body
+  const { groupname, finished, winner, season, date } = req.body
   //console.log({ groupname, finished, winner })
   // winner is received as the name of the winner, but saved as its ID
   const client = await pool.connect()
   try {
     const groups = await client.query(
-      `INSERT INTO groups (groupname)
-      VALUES ($1)
+      `INSERT INTO groups (groupname, season, lastupdate)
+      VALUES ($1, $4, to_timestamp($5))
       ON CONFLICT (groupname) DO UPDATE
-      SET finished = $2, winner = (
+      SET finished = $2, lastupdate = to_timestamp($5), winner = (
         SELECT user_id
         FROM players
         WHERE username = $3
       )
       RETURNING *`,
-      [groupname, finished || false, winner]
+      [groupname, finished || false, winner, season, date]
     )
     res.json(groups.rows[0])
   } catch (e) {
@@ -53,7 +53,8 @@ groupsRouter.get('/matches', async (req, res) => {
   const client = await pool.connect()
   try {
     const matches = await client.query(
-      `SELECT mt.match_id, p1.username AS player1, p2.username AS player2, mt.score1, mt.score2, mt.finished
+      `SELECT mt.match_id, p1.username AS player1, p2.username AS player2,
+        mt.score1, mt.score2, mt.finished, gp.lastupdate
       FROM matches AS mt
       LEFT JOIN players p1
       ON mt.player1 = p1.user_id

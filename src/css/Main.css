@@ -23,6 +23,12 @@
   overflow: auto;
 }
 
+#lastupdate {
+  color: grey;
+  font-size: 12px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+}
 
 /*Tables*/
 .groups-table tbody tr td:first-child {

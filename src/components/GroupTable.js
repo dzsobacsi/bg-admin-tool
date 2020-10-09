@@ -2,7 +2,7 @@ import React from 'react'
 import Group from './Group'
 
 const GroupTable = ({
-  groups, setMatches, setSelectedGroup, groupFilter, setUpdatedMatches
+  groups, setMatches, setSelectedGroup, groupFilter, setUpdatedMatches, setLastUpdate
 }) => (
   <table className='groups-table'>
     <thead>
@@ -23,6 +23,7 @@ const GroupTable = ({
           setMatches={setMatches}
           setUpdatedMatches={setUpdatedMatches}
           setSelectedGroup={setSelectedGroup}
+          setLastUpdate={setLastUpdate}
         />)
       }
     </tbody>
