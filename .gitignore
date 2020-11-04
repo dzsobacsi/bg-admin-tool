@@ -25,6 +25,7 @@ yarn-error.log*
 .env
 
 todo
+devnotes
 
 # not used anymore
 /controllers/dgLogin.js

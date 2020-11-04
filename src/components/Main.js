@@ -226,7 +226,11 @@ const Main = ({ setNotifMessage, adminMode }) => {
             <Summary matches={matches} setTopPlayer={setTopPlayer}/>
             <Results matches={matches} updatedMatches={updatedMatches}/>
             <span id="lastupdate">Last update: {lastUpdate}</span><br/>
-            <Button variant='outline-success' onClick={refreshResults}>
+            <Button
+              variant='outline-success'
+              onClick={refreshResults}
+              disabled={groups.find(g => g.groupname === selectedGroup).finished}
+            >
               Refresh results
             </Button>
           </>
