@@ -42,8 +42,9 @@ const Main = ({ setNotifMessage, adminMode }) => {
       .map(mid => dbService.getMatchResult(mid))
 
     let results = await Promise.all(matchResultPromises)
-    results.forEach((r, i) => {
-      // currentMatch is taken from the match state
+
+    results.forEach(r => {
+      // currentMatch is taken from the matches state
       const currentMatch = matches.find(m => m.match_id === r.mid)
       let toReverse = false
 
@@ -58,22 +59,20 @@ const Main = ({ setNotifMessage, adminMode }) => {
         if (JSON.stringify(playersInDb) !== JSON.stringify(playersFromDg)) {
           console.warn(`I have to reverse ${playersInDb[0]} and ${playersInDb[1]}`)
           toReverse = true
-          results[i].players.reverse()
-          results[i].score.reverse()
         }
 
         const updatedMatch = {
           match_id: r.mid,
-          player1: r.players[0],
-          player2: r.players[1],
-          score1: r.score[0],
-          score2: r.score[1],
+          player1: toReverse ? r.players[1] : r.players[0],
+          player2: toReverse ? r.players[0] : r.players[1],
+          score1:  toReverse ? r.score[1]   : r.score[0],
+          score2:  toReverse ? r.score[0]   : r.score[1],
           finished: r.finished
         }
-        console.log('result: ', r)
-        console.log('toReverse: ', toReverse)
+        //console.log('result: ', r)
+        //console.log('toReverse: ', toReverse)
         console.log('updatedMatch: ', updatedMatch)
-        console.log('---------------------')
+        //console.log('---------------------')
 
         nextStateMatches = nextStateMatches
           .map(m => m.match_id === r.mid ? updatedMatch : m)
