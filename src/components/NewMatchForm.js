@@ -14,9 +14,7 @@ const NewMatchForm = ({
     const groupName = e.target.gpname.value
     //console.log(groupName)
 
-    let matchResult = await dbService.getMatchResult(
-      e.target.mid.value, window.localStorage.getItem('login-cookie')
-    )
+    let matchResult = await dbService.getMatchResult(e.target.mid.value)
     //matchResult is an object with the following keys:
     // mid, players[2], score[2], groupname, finished
     //console.log(matchResult)
@@ -58,7 +56,7 @@ to the database?`)) {
       <form onSubmit={addNewMatch}>
         <table>
           <tbody>
-            <TextInput label='Match ID' name='mid'/>
+            <TextInput label='Match ID' name='mid' />
             <tr>
               <td>Group: </td>
               <td>

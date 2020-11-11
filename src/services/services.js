@@ -68,8 +68,11 @@ const saveResultToDb = async (mr, groupname) => {
     score1: mr.score[0],
     score2: mr.score[1],
     groupname,
-    finished: mr.finished
+    finished: mr.finished,
+    addedwhen: Math.floor(Date.now() / 1000),
+    addedbyuser: parseInt(window.localStorage.getItem('userid'))
   }
+  console.log(data)
   try {
     const response = await axios.post(url, data)
     return response.data

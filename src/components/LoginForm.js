@@ -20,6 +20,8 @@ const LoginForm = ({ adminMode, setAdminMode, setNotifMessage }) => {
     if (loginResponse) {
       const user = loginResponse.data
       window.localStorage.setItem('token', user.token)
+      window.localStorage.setItem('username', user.username)
+      window.localStorage.setItem('userid', user.userid)
 
       setNotifMessage(`${user.username} logged in`)
       setAdminMode(true)

@@ -86,8 +86,8 @@ const getMatchResultFromDg = async (mid) => {
       .split(' : 0')
       .slice(0, 2)
       .map(s => s.trim())
-    console.log('dgQueries: ', response.status)
-    console.log('dgQueries: ', players)
+    //console.log('dgQueries: ', response.status)
+    //console.log('dgQueries: ', players)
 
     const matchEndElement = $('tr:contains("and the match")')
     const finished = !!matchEndElement.length

@@ -9,16 +9,26 @@ matchesRouter.post('/', async (req, res) => {
   // TODO: Save also the user and the date to the table
 
   try {
-    const { match_id, player1, player2, score1, score2, groupname, finished } = req.body
+    const {
+      match_id,
+      player1,
+      player2,
+      score1,
+      score2,
+      groupname,
+      finished,
+      addedwhen,
+      addedbyuser
+    } = req.body
     const newMatch = await client.query(
-      `INSERT INTO matches (match_id, player1, player2, score1, score2, groupid, finished)
-        SELECT $1, $2, $3, $4, $5, gp.groupid, $7
+      `INSERT INTO matches (match_id, player1, player2, score1, score2, groupid, finished, addedwhen, addedbyuser)
+        SELECT $1, $2, $3, $4, $5, gp.groupid, $7, to_timestamp($8), $9
         FROM groups AS gp
         WHERE gp.groupname = $6
       ON CONFLICT (match_id) DO UPDATE
       SET score1 = $4, score2 = $5, finished = $7
       RETURNING *`,
-      [match_id, player1, player2, score1, score2, groupname, finished]
+      [match_id, player1, player2, score1, score2, groupname, finished, addedwhen, addedbyuser]
     )
     res.json(newMatch.rows[0])
   } catch (e) {
