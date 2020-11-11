@@ -72,7 +72,6 @@ const saveResultToDb = async (mr, groupname) => {
     addedwhen: Math.floor(Date.now() / 1000),
     addedbyuser: parseInt(window.localStorage.getItem('userid'))
   }
-  console.log(data)
   try {
     const response = await axios.post(url, data)
     return response.data

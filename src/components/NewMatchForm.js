@@ -1,6 +1,7 @@
 import React from 'react'
 import Button from 'react-bootstrap/Button'
-import TextInput from './TextInput'
+import Col from 'react-bootstrap/Col'
+import Form from 'react-bootstrap/Form'
 import dbService from '../services/services'
 
 // groups = {groupname, groupid, finished, winner, user_id, username}
@@ -35,7 +36,7 @@ const NewMatchForm = ({
     const playerIds = await Promise.all(playerIdPromises)
     //console.log(playerIds)
 
-    if (matchResult.players[0] && window.confirm(`Do you want to save the match
+    if (matchResult.players[0] && window.confirm(`Do you really want to save the match
 ${JSON.stringify(matchResult)}
 to the database?`)) {
       matchResult.players = playerIds
@@ -53,27 +54,34 @@ to the database?`)) {
 
   return (
     <div className="new-group-form">
-      <form onSubmit={addNewMatch}>
-        <table>
-          <tbody>
-            <TextInput label='Match ID' name='mid' />
-            <tr>
-              <td>Group: </td>
-              <td>
-                <select name='gpname'>
-                  {groups.map((g, i) => (
-                    <option key={i} value={g.groupname}>{g.groupname}</option>
+      <Form onSubmit={addNewMatch}>
+        <Form.Group>
+          <Form.Row>
+            <Form.Label column="lg" lg={3}>Match ID</Form.Label>
+            <Col>
+              <Form.Control type="number" size="sm" name="mid" />
+            </Col>
+          </Form.Row>
+          <Form.Row>
+            <Form.Label column="lg" lg={3}>Group</Form.Label>
+            <Col>
+              <Form.Control as="select" size="sm" name="gpname">
+                {groups
+                  .sort((a, b) => a.groupname.localeCompare(b.groupname))
+                  .map((g, i) => (
+                    <option key={i}>{g.groupname}</option>
                   ))}
-                </select>
-              </td>
-            </tr>
-          </tbody>
-        </table><br/>
-        <Button variant='outline-success' type="submit">add</Button>&nbsp;
-        <Button variant='outline-secondary' onClick={() => setFormVisible('')}>
-          cancel
-        </Button>
-      </form>
+              </Form.Control>
+            </Col>
+          </Form.Row>
+          <Form.Row>
+            <Button variant='outline-success' type="submit">add</Button>&nbsp;
+            <Button variant='outline-secondary' onClick={() => setFormVisible('')}>
+              cancel
+            </Button>
+          </Form.Row>
+        </Form.Group>
+      </Form>
     </div>
   )
 }
