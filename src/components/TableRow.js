@@ -1,6 +1,7 @@
 import React from 'react'
 
-// data = {value, class, link}
+// data = {value, class, mid, link}
+// updatedMatches = [mid]
 
 const TableRow = ({ data, updatedMatches }) => (
   <tr>

@@ -228,7 +228,10 @@ const Main = ({ setNotifMessage, adminMode }) => {
             <Button
               variant='outline-success'
               onClick={refreshResults}
-              disabled={groups.find(g => g.groupname === selectedGroup).finished}
+              disabled={
+                groups.find(g => g.groupname === selectedGroup) &&
+                groups.find(g => g.groupname === selectedGroup).finished
+              }
             >
               Refresh results
             </Button>

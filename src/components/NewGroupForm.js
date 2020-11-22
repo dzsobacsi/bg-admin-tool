@@ -106,8 +106,10 @@ Do you want to save the results to the database?`
       setFormVisible('')
       setLastUpdate(new Date().toString())
       setNotifMessage(`${results.length} matches were saved to the database`)
-    } else {
+    } else if (results.length === 0) {
       setNotifMessage('No matches were found. Enter valid group name and user names.')
+    } else {
+      setNotifMessage('Operation cancelled')
     }
   }
 
