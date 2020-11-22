@@ -1,11 +1,10 @@
 import React from 'react'
 import Group from './Group'
+import { sortGroups } from '../services/helperfunctions'
 
 const GroupTable = ({
   groups, setMatches, setSelectedGroup, groupFilter, setUpdatedMatches, setLastUpdate
 }) => {
-  const sortGroups = (a, b) => b.season - a.season || a.groupname.localeCompare(b.groupname)
-
   return (
     <table className='groups-table'>
       <thead>

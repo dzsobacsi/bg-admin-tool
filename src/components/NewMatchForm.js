@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import dbService from '../services/services'
+import { sortGroups } from '../services/helperfunctions'
 
 // groups = {groupname, groupid, finished, winner, user_id, username}
 
@@ -67,7 +68,7 @@ to the database?`)) {
             <Col>
               <Form.Control as="select" size="sm" name="gpname">
                 {groups
-                  .sort((a, b) => a.groupname.localeCompare(b.groupname))
+                  .sort(sortGroups)
                   .map((g, i) => (
                     <option key={i}>{g.groupname}</option>
                   ))}
