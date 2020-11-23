@@ -40,7 +40,7 @@ const getPlayerIdFromDg = async (username) => {
 const getMatchIdsFromDg = async (uid, event) => {
   //console.log('getMatchIdsFromDg:', uid, event, header)
   const url = encodeUrl(
-    baseUrl + `/bg/user/${uid}?sort_event=1&active=1&finished=1`
+    baseUrl + `/bg/user/${uid}?days_to_view=150&active=1&finished=1`
   )
   let matchIds = []
   try {
