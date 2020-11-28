@@ -50,10 +50,15 @@ const Summary = ({ matches, setTopPlayer }) => {
     summaryTable[m.player1].totall += m.score1 - m.score2
     summaryTable[m.player2].totall += m.score2 - m.score1
   })
+
+  const numOfMatchesPerPlayer = (players.length - 1) * 2
   players.forEach(p => {
+    //Set %won column
     summaryTable[p].percwon = summaryTable[p].fin
       ? Math.round(summaryTable[p].won / summaryTable[p].fin * 100)
       : '---'
+    //Update finished column to xx/numOfMatchesPerPlayer
+    summaryTable[p].fin = `${summaryTable[p].fin} / ${numOfMatchesPerPlayer}`
   })
 
   let tableToRender = Object.values(summaryTable)
