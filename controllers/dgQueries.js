@@ -9,7 +9,7 @@ const header = {
 }
 
 const getPlayerIdFromDg = async (username) => {
-  //console.log('getPlayerIdFromDg:', username, header)
+  //Takes a username, returns a user_id
   const url = encodeUrl(baseUrl + `/bg/plist?like=${username}&type=name`)
   try {
     const response = await axios({
@@ -38,7 +38,8 @@ const getPlayerIdFromDg = async (username) => {
 }
 
 const getMatchIdsFromDg = async (uid, event) => {
-  //console.log('getMatchIdsFromDg:', uid, event, header)
+  // Takes a user_id and an event name (i.e. group name)
+  // returns an array of  match_id-s
   const url = encodeUrl(
     baseUrl + `/bg/user/${uid}?days_to_view=150&active=1&finished=1`
   )
@@ -68,7 +69,11 @@ const getMatchIdsFromDg = async (uid, event) => {
 }
 
 const getMatchResultFromDg = async (mid) => {
-  //console.log('getMatchIdsFromDg:', mid, header)
+  // Takes a match_id, returns an object like
+  // mid: match_id,
+  // players: an array of the 2 player names (as their username)
+  // finished: boolean - true if the match is finished
+  // score: an array of 2 integers as the match score
   const url = baseUrl + `/bg/game/${mid}/0/list`
   try {
     const response = await axios({

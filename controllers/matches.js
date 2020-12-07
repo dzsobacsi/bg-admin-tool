@@ -6,8 +6,6 @@ const pool = require('../utils/db')
 matchesRouter.post('/', async (req, res) => {
   const client = await pool.connect()
 
-  // TODO: Save also the user and the date to the table
-
   try {
     const {
       match_id,

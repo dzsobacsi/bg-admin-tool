@@ -2,8 +2,6 @@ const playersRouter = require('express').Router()
 const dgQueries = require('./dgQueries')
 const pool = require('../utils/db')
 
-// TODO: Figure out the correct way to close the connection to the database
-
 //add a player to the database
 playersRouter.post('/', async (req, res) => {
   const client = await pool.connect()
