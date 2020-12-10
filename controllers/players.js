@@ -3,7 +3,8 @@ const dgQueries = require('./dgQueries')
 const pool = require('../utils/db')
 const bcrypt = require('bcrypt')
 
-//add a player to the database
+// add a player to the database
+// or update it whith passwordhash and email address
 // Takes: username*, password, email
 
 // This is currently not used for anything
@@ -44,50 +45,26 @@ playersRouter.post('/', async (req, res) => {
   }
 })
 
-//get player
-
-// TODO: Get player info from the database only,
-// return the complete row
+//get a player from the database
 playersRouter.get('/:username', async (req, res) => {
   // Check if player is in the database
   const client = await pool.connect()
   try {
     const dbRespnse = await client.query(
-      'SELECT user_id FROM players WHERE username = $1',
+      `SELECT user_id, username, administrator
+      FROM players
+      WHERE username = $1`,
       [req.params.username]
     )
     if (dbRespnse.rows.length) {
-      //console.log('response sent from the database')
-      res.send(dbRespnse.rows[0].user_id.toString())
-    }  else {
-
-      //If it is not in the database, check it on dailygammon
-      //userId is an integer if found and a string otherwise
-      const userId = await dgQueries.getPlayerIdFromDg(req.params.username)
-
-      // If found on dailygammon, save it to the database
-      if (parseInt(userId)) {
-        try {
-          const newPlayer = await client.query(
-            `INSERT INTO players (user_id, username)
-            VALUES ($1, $2)
-            RETURNING *`,
-            [userId, req.params.username]
-          )
-          console.log(`${JSON.stringify(newPlayer.rows[0])} is added to the database`)
-        } catch (e) {
-          console.error(`${req.params.username} could not be saved to database`)
-          console.error(e.message)
-        } finally {
-          res.send(userId)
-        }
-      } else {
-        res.send(userId) // If not found, userId is a string
-      }
+      res.send(dbRespnse.rows[0])
+    } else {
+      throw { message: `Error: There is no user ${req.params.username} in the database` }
     }
   } catch (e) {
     console.error('An error is catched in playersRouter.get')
     console.error(e.message)
+    res.send(e.message)
   } finally {
     client.release()
   }
