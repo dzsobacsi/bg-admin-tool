@@ -14,14 +14,24 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
       username: e.target.username.value,
       password1: e.target.password1.value,
       password2: e.target.password2.value,
+      email: e.target.email.value,
     }
     const user = {
       uname: eparams.username,
       passwd: eparams.password1,
+      email: eparams.email,
     }
-    if (eparams.password1 !== eparams.password2) {
+    if (user.uname.length < 3) {
+      setWarningText('The username must have at least 3 characters')
+      setTimeout(() => setWarningText(''), 4000)
+    }
+    else if (user.passwd.length < 6) {
+      setWarningText('The password must have at least 6 characters')
+      setTimeout(() => setWarningText(''), 4000)
+    }
+    else if (eparams.password1 !== eparams.password2) {
 
-      //Check if the two given passwords are the same
+      //Check if the two given passwords are not the same
       setWarningText('The two passwords are not the same, try again')
       setTimeout(() => setWarningText(''), 4000)
     } else {
@@ -73,6 +83,16 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
           <Form.Control
             type="password"
             name="password2"
+          />
+        </Col>
+      </Form.Group>
+
+      <Form.Group as={Row}>
+        <Form.Label column sm={4}>e-mail (optional): </Form.Label>
+        <Col sm={8}>
+          <Form.Control
+            type="text"
+            name="email"
           />
         </Col>
       </Form.Group>

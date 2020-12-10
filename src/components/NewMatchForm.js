@@ -11,6 +11,9 @@ const NewMatchForm = ({
   setFormVisible, matches, setMatches, groups, setNotifMessage
 }) => {
   const addNewMatch = async (e) => {
+
+    // TODO: check if match can be added with the new backend
+
     setNotifMessage('Please wait...')
     e.preventDefault()
     const groupName = e.target.gpname.value

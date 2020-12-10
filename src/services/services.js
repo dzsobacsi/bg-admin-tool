@@ -15,6 +15,7 @@ const getGroups = async () => {
   }
 }
 
+// TODO: check where is this used and rename
 const getPlayerId = async (username) => {
   let url = encodeUrl(baseUrl + `/players/${username}`)
   try {
@@ -94,7 +95,7 @@ const saveGroupToDb = async group => {
 
 export default {
   getGroups,
-  getPlayerId,
+  getPlayerId,  // TODO: rename
   getMatchIds,
   getMatchResult,
   saveResultToDb,

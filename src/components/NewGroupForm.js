@@ -13,6 +13,9 @@ const NewGroupForm = ({
   setNotifMessage
 }) => {
   const createNewGroup = async (e) => {
+
+    // TODO: check if group can be created with the new backend
+
     e.preventDefault()
     setNotifMessage('Please wait, this will take a little while...')
     const groupName = e.target.gpname.value
