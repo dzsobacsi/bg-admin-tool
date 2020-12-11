@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
-import registerService from '../services/register'
+import dbService from '../services/services'
 
 const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
   const [warningText, setWarningText] = useState('')
@@ -17,15 +17,15 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
       email: e.target.email.value,
     }
     const user = {
-      uname: eparams.username,
-      passwd: eparams.password1,
+      username: eparams.username,
+      password: eparams.password1,
       email: eparams.email,
     }
-    if (user.uname.length < 3) {
+    if (user.username.length < 3) {
       setWarningText('The username must have at least 3 characters')
       setTimeout(() => setWarningText(''), 4000)
     }
-    else if (user.passwd.length < 6) {
+    else if (user.password.length < 6) {
       setWarningText('The password must have at least 6 characters')
       setTimeout(() => setWarningText(''), 4000)
     }
@@ -36,17 +36,16 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
       setTimeout(() => setWarningText(''), 4000)
     } else {
 
-      //Check if the username is taken
-      const userFromDb = await registerService.getUser(user.uname)
-      const isTaken = !!userFromDb.data
-      if (isTaken) {
-        setWarningText('This username is already taken, choose another one')
+      //Check if the user is already registered
+      const userFromDb = await dbService.getUser(user.username)
+      if (userFromDb.data.registered) {
+        setWarningText('You already registered. Please, log in.')
         setTimeout(() => setWarningText(''), 4000)
       } else {
 
         // if everything is OK
-        await registerService.register(user)
-        setNotifMessage(`${user.uname} is now registered. Please, log in.`)
+        await dbService.register(user)
+        setNotifMessage(`${user.username} is now registered. Please, log in.`)
         toggleRegisterVisible()
       }
     }

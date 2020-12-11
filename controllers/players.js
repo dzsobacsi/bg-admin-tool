@@ -51,7 +51,7 @@ playersRouter.get('/:username', async (req, res) => {
   const client = await pool.connect()
   try {
     const dbRespnse = await client.query(
-      `SELECT user_id, username, administrator
+      `SELECT user_id, username, administrator, passwordhash IS NOT NULL AS registered
       FROM players
       WHERE username = $1`,
       [req.params.username]
