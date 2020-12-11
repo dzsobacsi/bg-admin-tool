@@ -44,9 +44,17 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
       } else {
 
         // if everything is OK
-        await dbService.register(user)
-        setNotifMessage(`${user.username} is now registered. Please, log in.`)
-        toggleRegisterVisible()
+        const addedUser = await dbService.register(user)
+        if (addedUser.data.user_id) {
+          setNotifMessage(`${user.username} is now registered. Please, log in.`)
+          toggleRegisterVisible()
+        } else {
+          setWarningText(
+            `${user.username} is not a player of DailyGammon.
+            Please, use the same username that you use on DailyGammon.`
+          )
+          setTimeout(() => setWarningText(''), 5500)
+        }
       }
     }
   }
