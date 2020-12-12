@@ -29,7 +29,7 @@ const NewGroupForm = ({
     let playerIds = await getPlayerIds(userNames)
     console.log(playerIds)
 
-    // Check if some of the playerIds are undefined
+    // Check if some of the playerIds are undefined, check them in DG
     // and add the missing players to the database
     if (playerIds.includes(undefined)) {
       let missingPlayers = []
@@ -41,7 +41,10 @@ const NewGroupForm = ({
         .map(pl => dbService.register({ username: pl }))
       await Promise.all(registerPromises)
       playerIds = await getPlayerIds(userNames)
-      console.log(playerIds)
+      if (playerIds.includes(undefined)) {
+        console.warn('Some of the given players do not exist on DailyGammon!')
+      }
+      playerIds = playerIds.filter(pid => pid !== undefined)
     }
 
     // Create an object in which usernames the key a payerIds the value
@@ -76,7 +79,7 @@ const NewGroupForm = ({
     console.log(results)
 
     //check if number of matches is n * (n - 1)
-    const expectedNrOfMatches = userNames.length * (userNames.length - 1)
+    const expectedNrOfMatches = playerIds.length * (playerIds.length - 1)
     if (results.length !== expectedNrOfMatches) {
       console.warn('The number of matches does not fit to the number of players')
     }
