@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import dbService from '../services/services'
-import { sortGroups } from '../services/helperfunctions'
+import { sortGroups, getPlayerIds } from '../services/helperfunctions'
 
 // groups = {groupname, groupid, finished, winner, user_id, username}
 
@@ -11,9 +11,6 @@ const NewMatchForm = ({
   setFormVisible, matches, setMatches, groups, setNotifMessage
 }) => {
   const addNewMatch = async (e) => {
-
-    // TODO: check if match can be added with the new backend
-
     setNotifMessage('Please wait...')
     e.preventDefault()
     const groupName = e.target.gpname.value
@@ -34,11 +31,7 @@ const NewMatchForm = ({
     }
 
     // get the player IDs
-    const playerIdPromises = matchResult.players
-      .map(uname => dbService.getPlayerId(uname))
-
-    const playerIds = await Promise.all(playerIdPromises)
-    //console.log(playerIds)
+    const playerIds = await getPlayerIds(matchResult.players)
 
     if (matchResult.players[0] && window.confirm(`Do you really want to save the match
 ${JSON.stringify(matchResult)}

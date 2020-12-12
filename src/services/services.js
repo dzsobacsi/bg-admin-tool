@@ -15,19 +15,6 @@ const getGroups = async () => {
   }
 }
 
-// TODO: check where is this used
-// TODO: to be removed and replaced by getUser below
-const getPlayerId = async (username) => {
-  let url = encodeUrl(baseUrl + `/players/${username}`)
-  try {
-    const response = await axios.get(url)
-    return response.data
-  } catch (e) {
-    console.error('getPlayerId err')
-    console.error(e.message)
-  }
-}
-
 const getUser = async (username) => {
   const url = encodeUrl(baseUrl + `/players/${username}`)
   try {
@@ -117,7 +104,6 @@ const register = async (user) => {
 
 export default {
   getGroups,
-  getPlayerId,  // TODO: rename
   getUser,
   getMatchIds,
   getMatchResult,

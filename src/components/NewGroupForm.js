@@ -2,6 +2,7 @@ import React from 'react'
 import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
+import { getPlayerIds } from '../services/helperfunctions'
 
 const NewGroupForm = ({
   setFormVisible,
@@ -13,30 +14,44 @@ const NewGroupForm = ({
   setNotifMessage
 }) => {
   const createNewGroup = async (e) => {
-
-    // TODO: check if group can be created with the new backend
-
     e.preventDefault()
     setNotifMessage('Please wait, this will take a little while...')
     const groupName = e.target.gpname.value
 
-    //fetch player IDs
+    // collect usernames from the form and filter out the ones with zero length
     const inputArray = document.getElementsByName('array')
     const userNames = [...inputArray]
       .map(inp => inp.value)
       .filter(i => i.length)
     console.log(userNames)
 
-    const playerIdPromises = userNames
-      .map(uname => dbService.getPlayerId(uname))
-    const playerIds = await Promise.all(playerIdPromises)
+    // get all playerIds
+    let playerIds = await getPlayerIds(userNames)
     console.log(playerIds)
 
+    // Check if some of the playerIds are undefined
+    // and add the missing players to the database
+    if (playerIds.includes(undefined)) {
+      let missingPlayers = []
+      for (let i = 0; i < playerIds.length; i++) {
+        if (!playerIds[i]) missingPlayers.push(userNames[i])
+      }
+
+      const registerPromises = missingPlayers
+        .map(pl => dbService.register({ username: pl }))
+      await Promise.all(registerPromises)
+      playerIds = await getPlayerIds(userNames)
+      console.log(playerIds)
+    }
+
+    // Create an object in which usernames the key a payerIds the value
+    // Would it bring any benefit to use Map instead of an object?
     let players = {}
     userNames.forEach((un, i) => players[un] = playerIds[i])
     console.log(players)
 
     //fetch match IDs
+    // getMatchIds returns an object like { matchIds: [] }
     const matchIdPromises = playerIds
       .map(pid => dbService.getMatchIds(pid, groupName))
     let matchIds = await Promise.all(matchIdPromises)

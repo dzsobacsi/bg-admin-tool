@@ -7,6 +7,7 @@ import Results from './Results'
 import Summary from './Summary'
 import Filter from './Filter'
 import dbService from '../services/services'
+import { getPlayerIds } from '../services/helperfunctions'
 
 
 const Main = ({ setNotifMessage, adminMode }) => {
@@ -97,9 +98,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
       return
     }
 
-    const playerIdPromises = userNames
-      .map(uname => dbService.getPlayerId(uname))
-    const playerIds = await Promise.all(playerIdPromises)
+    const playerIds = await getPlayerIds(userNames)
     if (playerIds.some(pid => typeof pid === 'undefined')) {
       console.error('Some player IDs are undefined')
       setNotifMessage('Something went wrong. Please, try again.')
