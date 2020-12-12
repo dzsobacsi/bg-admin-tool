@@ -34,7 +34,7 @@ groupsRouter.get('/', async (req, res) => {
   const client = await pool.connect()
   try {
     const groups = await client.query(
-      `SELECT gp.groupname, gp.finished, gp.lastupdate, pl.username AS winner
+      `SELECT gp.groupname, gp.finished, gp.season, gp.lastupdate, pl.username AS winner
       FROM groups AS gp
       LEFT JOIN players AS pl
       ON gp.winner = pl.user_id`
