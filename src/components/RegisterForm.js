@@ -30,7 +30,6 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
       setTimeout(() => setWarningText(''), 4000)
     }
     else if (eparams.password1 !== eparams.password2) {
-
       //Check if the two given passwords are not the same
       setWarningText('The two passwords are not the same, try again')
       setTimeout(() => setWarningText(''), 4000)

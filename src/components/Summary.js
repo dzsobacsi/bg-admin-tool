@@ -25,7 +25,7 @@ const Summary = ({ matches, setTopPlayer }) => {
   columnRefs.forEach(c => rowTemplate[c] = 0)
 
   let summaryTable = {}
-  players.forEach(p => summaryTable[p] = { player: p, ...rowTemplate })
+  players.forEach(p => summaryTable[p] = { ...rowTemplate })
   matches.forEach(m => {
     // Only if finihsed
     if (m.finished) {
@@ -62,7 +62,7 @@ const Summary = ({ matches, setTopPlayer }) => {
   })
 
   let tableToRender = Object.values(summaryTable)
-    .sort((a, b) => b.won - a.won || b.totall - a.totall || b.totfin - a.totfin)
+    .sort((a, b) => b.won - a.won || b.totfin - a.totfin || b.totall - a.totall)
     .map(row => Object.values(row))
     .map(row => row.map(
       (data, i) => ({ value: data, class: i ? 'default' : 't-header' })
