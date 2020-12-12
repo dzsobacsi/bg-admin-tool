@@ -7,7 +7,6 @@ const config = require('./utils/config')
 const playersRouter = require('./controllers/players')
 const matchesRouter = require('./controllers/matches')
 const groupsRouter = require('./controllers/groups')
-const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const app = express()
 
@@ -22,7 +21,6 @@ app.use(express.static(path.join(__dirname, 'build')))
 app.use('/players', playersRouter)
 app.use('/matches', matchesRouter)
 app.use('/groups', groupsRouter)
-app.use('/users', usersRouter)
 app.use('/login', loginRouter)
 
 app.get('/ping', (req, res) => {
