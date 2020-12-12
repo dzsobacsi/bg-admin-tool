@@ -1,7 +1,7 @@
 import React from 'react'
 import LoginForm from './LoginForm'
 
-const Header = ({ adminMode, setAdminMode, setNotifMessage }) => {
+const Header = ({ loggedInUser, setLoggedInUser, setNotifMessage }) => {
   return (
     <div className="Header">
       <div className="header-1">
@@ -17,9 +17,9 @@ const Header = ({ adminMode, setAdminMode, setNotifMessage }) => {
       </div>
       <div className="header-3">
         <LoginForm
-          adminMode={adminMode}
-          setAdminMode={setAdminMode}
+          loggedInUser={loggedInUser}
           setNotifMessage={setNotifMessage}
+          setLoggedInUser={setLoggedInUser}
         />
       </div>
     </div>

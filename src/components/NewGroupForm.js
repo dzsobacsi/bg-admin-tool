@@ -2,6 +2,7 @@ import React from 'react'
 import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
+import { getPlayerIds } from '../services/helperfunctions'
 
 const NewGroupForm = ({
   setFormVisible,
@@ -17,23 +18,43 @@ const NewGroupForm = ({
     setNotifMessage('Please wait, this will take a little while...')
     const groupName = e.target.gpname.value
 
-    //fetch player IDs
+    // collect usernames from the form and filter out the ones with zero length
     const inputArray = document.getElementsByName('array')
     const userNames = [...inputArray]
       .map(inp => inp.value)
       .filter(i => i.length)
     console.log(userNames)
 
-    const playerIdPromises = userNames
-      .map(uname => dbService.getPlayerId(uname))
-    const playerIds = await Promise.all(playerIdPromises)
+    // get all playerIds
+    let playerIds = await getPlayerIds(userNames)
     console.log(playerIds)
 
+    // Check if some of the playerIds are undefined, check them in DG
+    // and add the missing players to the database
+    if (playerIds.includes(undefined)) {
+      let missingPlayers = []
+      for (let i = 0; i < playerIds.length; i++) {
+        if (!playerIds[i]) missingPlayers.push(userNames[i])
+      }
+
+      const registerPromises = missingPlayers
+        .map(pl => dbService.register({ username: pl }))
+      await Promise.all(registerPromises)
+      playerIds = await getPlayerIds(userNames)
+      if (playerIds.includes(undefined)) {
+        console.warn('Some of the given players do not exist on DailyGammon!')
+      }
+      playerIds = playerIds.filter(pid => pid !== undefined)
+    }
+
+    // Create an object in which usernames the key a payerIds the value
+    // Would it bring any benefit to use Map instead of an object?
     let players = {}
     userNames.forEach((un, i) => players[un] = playerIds[i])
     console.log(players)
 
     //fetch match IDs
+    // getMatchIds returns an object like { matchIds: [] }
     const matchIdPromises = playerIds
       .map(pid => dbService.getMatchIds(pid, groupName))
     let matchIds = await Promise.all(matchIdPromises)
@@ -58,7 +79,7 @@ const NewGroupForm = ({
     console.log(results)
 
     //check if number of matches is n * (n - 1)
-    const expectedNrOfMatches = userNames.length * (userNames.length - 1)
+    const expectedNrOfMatches = playerIds.length * (playerIds.length - 1)
     if (results.length !== expectedNrOfMatches) {
       console.warn('The number of matches does not fit to the number of players')
     }

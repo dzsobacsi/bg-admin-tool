@@ -15,13 +15,12 @@ const getGroups = async () => {
   }
 }
 
-const getPlayerId = async (username) => {
-  let url = encodeUrl(baseUrl + `/players/${username}`)
+const getUser = async (username) => {
+  const url = encodeUrl(baseUrl + `/players/${username}`)
   try {
     const response = await axios.get(url)
-    return response.data
+    return response
   } catch (e) {
-    console.error('getPlayerId err')
     console.error(e.message)
   }
 }
@@ -92,12 +91,24 @@ const saveGroupToDb = async group => {
   }
 }
 
+const register = async (user) => {
+  // takes a user object { username*, password, email }
+  const url = baseUrl + '/players'
+  try {
+    const response = await axios.post(url, user)
+    return response
+  } catch (e) {
+    console.error(e.message)
+  }
+}
+
 export default {
   getGroups,
-  getPlayerId,
+  getUser,
   getMatchIds,
   getMatchResult,
   saveResultToDb,
   getGroupMatches,
   saveGroupToDb,
+  register,
 }

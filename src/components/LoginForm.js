@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal'
 import RegisterForm from './RegisterForm'
 import loginService from '../services/login'
 
-const LoginForm = ({ adminMode, setAdminMode, setNotifMessage }) => {
+const LoginForm = ({ loggedInUser, setLoggedInUser, setNotifMessage }) => {
   const [registerVisble, setRegisterVisible] = useState(false)
 
   const toggleRegisterVisible = () => setRegisterVisible(!registerVisble)
@@ -24,21 +24,21 @@ const LoginForm = ({ adminMode, setAdminMode, setNotifMessage }) => {
       window.localStorage.setItem('userid', user.userid)
 
       setNotifMessage(`${user.username} logged in`)
-      setAdminMode(true)
+      setLoggedInUser(user.username)
     } else {
       setNotifMessage('Wrong credentials')
     }
   }
 
   const handleLogout = () => {
-    setAdminMode(false)
+    setLoggedInUser(null)
     setNotifMessage('User logged out')
     window.localStorage.clear()
   }
 
   return (
     <>
-      {adminMode === false &&
+      {!loggedInUser &&
         <><Form inline onSubmit={handleLogin}>
           <Form.Control
             className="smaller-form"
@@ -89,7 +89,7 @@ const LoginForm = ({ adminMode, setAdminMode, setNotifMessage }) => {
           </Modal.Body>
         </Modal></>
       }
-      {adminMode === true &&
+      {!!loggedInUser &&
         <Button
           className="smaller-form"
           variant="success"

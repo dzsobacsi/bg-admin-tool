@@ -9,7 +9,7 @@ loginRouter.post('/', async (req, res) => {
   const client = await pool.connect()
   try {
     let user = await client.query(
-      `SELECT * FROM users
+      `SELECT * FROM players
       WHERE username = $1`,
       [username]
     )
@@ -32,7 +32,7 @@ loginRouter.post('/', async (req, res) => {
 
     const token = jwt.sign(userForToken, config.SECRET)
 
-    res.status(200).send({ token, username: user.username, userid: user.uid })
+    res.status(200).send({ token, username: user.username, userid: user.user_id })
   } catch (e) {
     console.error('Login router error')
     console.error(e.message)

@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
-import registerService from '../services/register'
+import dbService from '../services/services'
 
 const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
   const [warningText, setWarningText] = useState('')
@@ -14,30 +14,47 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
       username: e.target.username.value,
       password1: e.target.password1.value,
       password2: e.target.password2.value,
+      email: e.target.email.value,
     }
     const user = {
-      uname: eparams.username,
-      passwd: eparams.password1,
+      username: eparams.username,
+      password: eparams.password1,
+      email: eparams.email,
     }
-    if (eparams.password1 !== eparams.password2) {
+    if (user.username.length < 3) {
+      setWarningText('The username must have at least 3 characters')
+      setTimeout(() => setWarningText(''), 4000)
+    }
+    else if (user.password.length < 6) {
+      setWarningText('The password must have at least 6 characters')
+      setTimeout(() => setWarningText(''), 4000)
+    }
+    else if (eparams.password1 !== eparams.password2) {
 
-      //Check if the two given passwords are the same
+      //Check if the two given passwords are not the same
       setWarningText('The two passwords are not the same, try again')
       setTimeout(() => setWarningText(''), 4000)
     } else {
 
-      //Check if the username is taken
-      const userFromDb = await registerService.getUser(user.uname)
-      const isTaken = !!userFromDb.data
-      if (isTaken) {
-        setWarningText('This username is already taken, choose another one')
+      //Check if the user is already registered
+      const userFromDb = await dbService.getUser(user.username)
+      if (userFromDb.data.registered) {
+        setWarningText('You already registered. Please, log in.')
         setTimeout(() => setWarningText(''), 4000)
       } else {
 
         // if everything is OK
-        await registerService.register(user)
-        setNotifMessage(`${user.uname} is now registered. Please, log in.`)
-        toggleRegisterVisible()
+        const addedUser = await dbService.register(user)
+        if (addedUser.data.user_id) {
+          setNotifMessage(`${user.username} is now registered. Please, log in.`)
+          toggleRegisterVisible()
+        } else {
+          setWarningText(
+            `${user.username} is not a player of DailyGammon.
+            Please, use the same username that you use on DailyGammon.`
+          )
+          setTimeout(() => setWarningText(''), 5500)
+        }
       }
     }
   }
@@ -73,6 +90,16 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
           <Form.Control
             type="password"
             name="password2"
+          />
+        </Col>
+      </Form.Group>
+
+      <Form.Group as={Row}>
+        <Form.Label column sm={4}>e-mail (optional): </Form.Label>
+        <Col sm={8}>
+          <Form.Control
+            type="text"
+            name="email"
           />
         </Col>
       </Form.Group>
