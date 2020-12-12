@@ -29,14 +29,15 @@ groupsRouter.post('/', async (req, res) => {
   }
 })
 
-//get all groupnames from the database
-groupsRouter.get('/groupnames', async (req, res) => {
+//get all groups from the database
+groupsRouter.get('/', async (req, res) => {
   const client = await pool.connect()
   try {
     const groups = await client.query(
-      `SELECT * FROM groups
-      LEFT JOIN players
-      ON groups.winner = players.user_id`
+      `SELECT gp.groupname, gp.finished, gp.lastupdate, pl.username AS winner
+      FROM groups AS gp
+      LEFT JOIN players AS pl
+      ON gp.winner = pl.user_id`
     )
     res.json(groups.rows)
   } catch (e) {

@@ -7,7 +7,7 @@ const baseUrl = process.env.NODE_ENV === 'development'
 
 const getGroups = async () => {
   try {
-    const response = await axios.get(baseUrl + '/groups/groupnames')
+    const response = await axios.get(baseUrl + '/groups')
     return response.data
   } catch (e) {
     console.error('getGroups err')
