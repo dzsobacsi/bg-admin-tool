@@ -25,7 +25,7 @@ const Summary = ({ matches, setTopPlayer }) => {
   columnRefs.forEach(c => rowTemplate[c] = 0)
 
   let summaryTable = {}
-  players.forEach(p => summaryTable[p] = { ...rowTemplate })
+  players.forEach(p => summaryTable[p] = { player: p, ...rowTemplate })
   matches.forEach(m => {
     // Only if finihsed
     if (m.finished) {
