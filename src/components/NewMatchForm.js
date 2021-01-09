@@ -15,18 +15,17 @@ const NewMatchForm = ({
     e.preventDefault()
     const groupName = e.target.gpname.value
 
-    let matchResult = await dbService.getMatchResult(e.target.mid.value)
+    const matchResult = await dbService.getMatchResult(e.target.mid.value)
     //matchResult is an object with the following keys:
     // mid, players[2], score[2], groupname, finished
-    //console.log(matchResult)
 
     // reverse the 2 players if they have a match already
     matchResult.reversed = false
     if (matches.find(
       m => JSON.stringify([m.player1, m.player2]) === JSON.stringify(matchResult.players))
     ) {
-      matchResult.players = matchResult.players.reverse()
-      matchResult.score = matchResult.score.reverse()
+      matchResult.players.reverse()
+      matchResult.score.reverse()
       matchResult.reversed = true
       console.warn('players are reversed')
     }
