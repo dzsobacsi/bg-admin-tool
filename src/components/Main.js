@@ -44,36 +44,37 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
     let results = await Promise.all(matchResultPromises)
 
+    // If a match result is reversed in the DB, then we reverse it in the
+    // results array as well
+    results = results.map(r => {
+      let newRes = { ...r, reversed: false }
+      const currentMatch = matches.find(m => m.match_id === r.mid) // currentMatch is taken from the matches state
+      if (currentMatch.reversed) {
+        newRes.players.reverse()
+        newRes.score.reverse()
+        newRes.reversed = true
+      }
+      return newRes
+    })
+
+    // Calculating the next state of the matches array
     results.forEach(r => {
-      // currentMatch is taken from the matches state
       const currentMatch = matches.find(m => m.match_id === r.mid)
-      let toReverse = false
 
       // If the match result changed since last update
       if (currentMatch.score1 !== r.score[0] || currentMatch.score2 !== r.score[1]) {
         changedMatches.push(r.mid)
 
-        // if players are stored in the database in reversed order,
-        // they have to be reveresed here too
-        const playersInDb = [currentMatch.player1, currentMatch.player2]
-        const playersFromDg = r.players
-        if (JSON.stringify(playersInDb) !== JSON.stringify(playersFromDg)) {
-          console.warn(`I have to reverse ${playersInDb[0]} and ${playersInDb[1]}`)
-          toReverse = true
-        }
-
         const updatedMatch = {
           match_id: r.mid,
-          player1: toReverse ? r.players[1] : r.players[0],
-          player2: toReverse ? r.players[0] : r.players[1],
-          score1:  toReverse ? r.score[1]   : r.score[0],
-          score2:  toReverse ? r.score[0]   : r.score[1],
-          finished: r.finished
+          player1: r.players[1],
+          player2: r.players[0],
+          score1:  r.score[1],
+          score2:  r.score[0],
+          finished: r.finished,
+          reversed: r.reversed,
         }
-        //console.log('result: ', r)
-        //console.log('toReverse: ', toReverse)
         console.log('updatedMatch: ', updatedMatch)
-        //console.log('---------------------')
 
         nextStateMatches = nextStateMatches
           .map(m => m.match_id === r.mid ? updatedMatch : m)
@@ -125,25 +126,18 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
     // Check if all the matches are finished
     // and update the group table if they are
+    // In any case, the group is saved back to the DB, to refresh its date
     const groupIsFinished = nextStateMatches.every(m => m.finished)
     const groupToUpdate = groups.find(g => g.groupname === selectedGroup)
-    let updatedGroup
+    const updatedGroup  = { ...groupToUpdate }
 
     if (groupIsFinished) {
       console.log('Group is finished!')
-      updatedGroup = {
-        ...groupToUpdate,
-        winner: topPlayer,
-        username: topPlayer,
-        finished: true,
-        date: Math.floor(Date.now() / 1000)
-      }
-    } else {
-      updatedGroup = {
-        ...groupToUpdate,
-        date: Math.floor(Date.now() / 1000)
-      }
+      updatedGroup.winner = topPlayer
+      updatedGroup.username = topPlayer
+      updatedGroup.finished = true
     }
+
     const savedGroup = await dbService.saveGroupToDb(updatedGroup)
     console.log('savedGroup', savedGroup)
 

@@ -4,7 +4,7 @@ export const sortGroups = (a, b) =>
   b.season - a.season || a.groupname.localeCompare(b.groupname)
 
 // takes an array of userNames
-// returns an array of userIds
+// returns an array of userIds from the database
 export const getPlayerIds = async userNames => {
   const playerIdPromises = userNames.map(uname => dbService.getUser(uname))
   const players = await Promise.all(playerIdPromises)

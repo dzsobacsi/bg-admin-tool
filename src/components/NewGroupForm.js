@@ -13,6 +13,18 @@ const NewGroupForm = ({
   setLastUpdate,
   setNotifMessage
 }) => {
+
+  const registerMissingPlayers = async (playerIds, userNames) => {
+    let missingPlayers = []
+    for (let i = 0; i < playerIds.length; i++) {
+      if (!playerIds[i]) missingPlayers.push(userNames[i])
+    }
+
+    const registerPromises = missingPlayers
+      .map(pl => dbService.register({ username: pl }))
+    await Promise.all(registerPromises)
+  }
+
   const createNewGroup = async (e) => {
     e.preventDefault()
     setNotifMessage('Please wait, this will take a little while...')
@@ -32,14 +44,7 @@ const NewGroupForm = ({
     // Check if some of the playerIds are undefined, check them in DG
     // and add the missing players to the database
     if (playerIds.includes(undefined)) {
-      let missingPlayers = []
-      for (let i = 0; i < playerIds.length; i++) {
-        if (!playerIds[i]) missingPlayers.push(userNames[i])
-      }
-
-      const registerPromises = missingPlayers
-        .map(pl => dbService.register({ username: pl }))
-      await Promise.all(registerPromises)
+      await registerMissingPlayers(playerIds, userNames)
       playerIds = await getPlayerIds(userNames)
       if (playerIds.includes(undefined)) {
         console.warn('Some of the given players do not exist on DailyGammon!')
@@ -70,10 +75,11 @@ const NewGroupForm = ({
       r => userNames.includes(r.players[0]) && userNames.includes(r.players[1])
     )
 
-    // This block replaces usernames with user IDs
+    // This block replaces usernames with user IDs and adds a new key reversed
     results = results.map(r => {
       let newRes = { ...r }
       newRes.players = r.players.map(p => players[p])
+      newRes.reversed = false
       return newRes
     })
     console.log(results)
@@ -92,7 +98,7 @@ const NewGroupForm = ({
 also have another match with each other. Their order is replaced`)
         results[i].players.reverse()
         results[i].score.reverse()
-        seen.push(JSON.stringify(r.players))
+        results[i].reversed = true
       } else {
         seen.push(JSON.stringify(r.players))
       }

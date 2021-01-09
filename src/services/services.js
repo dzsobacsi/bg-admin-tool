@@ -58,6 +58,7 @@ const getGroupMatches = async groupname => {
   }
 }
 
+// mr is the result of getMatchResultFromDg
 const saveResultToDb = async (mr, groupname) => {
   const url = baseUrl + '/matches'
   const data = {
@@ -68,8 +69,8 @@ const saveResultToDb = async (mr, groupname) => {
     score2: mr.score[1],
     groupname,
     finished: mr.finished,
-    addedwhen: Math.floor(Date.now() / 1000),
-    addedbyuser: parseInt(window.localStorage.getItem('userid'))
+    addedbyuser: parseInt(window.localStorage.getItem('userid')),
+    reversed: mr.reversed,
   }
   try {
     const response = await axios.post(url, data)
