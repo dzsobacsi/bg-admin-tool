@@ -175,18 +175,23 @@ const Main = ({ setNotifMessage, adminMode }) => {
                 </>
               }
             </div><br/>
-            {adminMode && <Button
-              variant='outline-success'
-              onClick={() => setFormVisible('new-group')}
-            >
-              Add group
-            </Button>}&nbsp;
-            {adminMode && <Button
-              variant='outline-success'
-              onClick={() => setFormVisible('new-match')}
-            >
-              Add match
-            </Button>}
+            {adminMode &&
+              <Button
+                variant='outline-success'
+                onClick={() => setFormVisible('new-group')}
+              >
+                Add group
+              </Button>
+            }
+            &nbsp;
+            {adminMode &&
+              <Button
+                variant='outline-success'
+                onClick={() => setFormVisible('new-match')}
+              >
+                Add match
+              </Button>
+            }
           </div>
         }
         {formVisible === 'new-group' &&
