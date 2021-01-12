@@ -36,6 +36,7 @@ const getMatchIds = async (uid, event) => {
   }
 }
 
+// mid can be either a string or an int
 const getMatchResult = async (mid) => {
   let url = baseUrl + `/matches/${mid}`
   try {
@@ -47,6 +48,7 @@ const getMatchResult = async (mid) => {
   }
 }
 
+// get matches of a given group from the database
 const getGroupMatches = async groupname => {
   const url = encodeUrl(baseUrl + `/groups/matches?groupname=${groupname}`)
   try {
@@ -58,13 +60,20 @@ const getGroupMatches = async groupname => {
   }
 }
 
-// mr is the result of getMatchResultFromDg
+/*mr is a match result object:
+{
+  mid
+  [playerIds]
+  [score]
+  finished
+  reversed
+}*/
 const saveResultToDb = async (mr, groupname) => {
   const url = baseUrl + '/matches'
   const data = {
     match_id: mr.mid,
-    player1: mr.players[0],
-    player2: mr.players[1],
+    player1: mr.playerIds[0],
+    player2: mr.playerIds[1],
     score1: mr.score[0],
     score2: mr.score[1],
     groupname,
@@ -81,6 +90,7 @@ const saveResultToDb = async (mr, groupname) => {
   }
 }
 
+// takes a group object with properties: finished, groupname, season, winner
 const saveGroupToDb = async group => {
   const url = baseUrl + '/groups'
   try {
@@ -97,7 +107,7 @@ const register = async (user) => {
   const url = baseUrl + '/players'
   try {
     const response = await axios.post(url, user)
-    return response
+    return response.data
   } catch (e) {
     console.error(e.message)
   }

@@ -123,7 +123,7 @@ const getMatchResultFromDg = async (mid) => {
 
     return {
       mid: parseInt(mid),
-      players,
+      playerNames: players,
       finished,
       score
     }

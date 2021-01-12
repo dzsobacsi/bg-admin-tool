@@ -3,56 +3,62 @@ import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import dbService from '../services/services'
-import { sortGroups, getPlayerIds } from '../services/helperfunctions'
-
-// groups = {groupname, groupid, finished, winner, user_id, username}
+import {
+  getMatchResultsFromDg,
+  processResultObjects,
+  swapResult,
+} from '../services/helperfunctions'
 
 const NewMatchForm = ({
-  setFormVisible, matches, setMatches, groups, setNotifMessage
+  setFormVisible, matches, setMatches, selectedGroup, setNotifMessage
 }) => {
   const addNewMatch = async (e) => {
     setNotifMessage('Please wait...')
     e.preventDefault()
-    const groupName = e.target.gpname.value
 
-    const matchResult = await dbService.getMatchResult(e.target.mid.value)
+    const matchResults = await getMatchResultsFromDg([e.target.mid.value])
+    const processedResults = await processResultObjects(matchResults)
+    if (!processedResults) {
+      setNotifMessage('Something went wrong. Please, try again.')
+      return
+    }
+    let matchResult = processedResults[0]
     //matchResult is an object with the following keys:
     // mid, players[2], score[2], groupname, finished
 
     // reverse the 2 players if they have a match already
-    matchResult.reversed = false
     if (matches.find(
-      m => JSON.stringify([m.player1, m.player2]) === JSON.stringify(matchResult.players))
+      m => JSON.stringify([m.player1, m.player2]) === JSON.stringify(matchResult.playerNames))
     ) {
-      matchResult.players.reverse()
-      matchResult.score.reverse()
-      matchResult.reversed = true
+      matchResult = swapResult(matchResult)
       console.warn('players are reversed')
     }
 
-    // get the player IDs
-    const playerIds = await getPlayerIds(matchResult.players)
-
-    if (matchResult.players[0] && window.confirm(`Do you really want to save the match
+    if (matchResult.playerNames[0] && window.confirm(`Do you really want to save the match
 ${JSON.stringify(matchResult)}
 to the database?`)) {
-      matchResult.players = playerIds
-      const savedResult = await dbService.saveResultToDb(matchResult, groupName)
+      const savedResult = await dbService.saveResultToDb(matchResult, selectedGroup)
+      const matchesFromDb = await dbService.getGroupMatches(selectedGroup)
 
-      const matchesFromDb = await dbService.getGroupMatches(groupName)
       setMatches(matchesFromDb)
       setFormVisible('')
       console.log(savedResult)
       setNotifMessage('Match is saved to the database')
-    } else {
+    } else if (!matchResults.length) {
       setNotifMessage('No match was found. Enter valid match ID.')
+    } else {
+      setNotifMessage('Operation cancelled')
     }
   }
 
   return (
     <div className="new-group-form">
+      {!selectedGroup && <h4 style={{ color: 'red' }}>Please, select a group on the main page!</h4>}
       <Form onSubmit={addNewMatch}>
         <Form.Group>
+          <Form.Row>
+            <Form.Label column="lg" lg={12}>Selected Group: {selectedGroup}</Form.Label>
+          </Form.Row>
           <Form.Row>
             <Form.Label column="lg" lg={3}>Match ID</Form.Label>
             <Col>
@@ -60,19 +66,7 @@ to the database?`)) {
             </Col>
           </Form.Row>
           <Form.Row>
-            <Form.Label column="lg" lg={3}>Group</Form.Label>
-            <Col>
-              <Form.Control as="select" size="sm" name="gpname">
-                {groups
-                  .sort(sortGroups)
-                  .map((g, i) => (
-                    <option key={i}>{g.groupname}</option>
-                  ))}
-              </Form.Control>
-            </Col>
-          </Form.Row>
-          <Form.Row>
-            <Button variant='outline-success' type="submit">add</Button>&nbsp;
+            <Button variant='outline-success' type="submit" disabled={!selectedGroup}>add</Button>&nbsp;
             <Button variant='outline-secondary' onClick={() => setFormVisible('')}>
               cancel
             </Button>
