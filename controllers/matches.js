@@ -3,6 +3,7 @@ const dgQueries = require('./dgQueries')
 const pool = require('../utils/db')
 
 //add a match to the database
+// takes the group name as a string but saves it as its ID (fk)
 matchesRouter.post('/', async (req, res) => {
   const client = await pool.connect()
 
@@ -15,18 +16,19 @@ matchesRouter.post('/', async (req, res) => {
       score2,
       groupname,
       finished,
-      addedwhen,
-      addedbyuser
+      addedbyuser,
+      reversed
     } = req.body
     const newMatch = await client.query(
-      `INSERT INTO matches (match_id, player1, player2, score1, score2, groupid, finished, addedwhen, addedbyuser)
-        SELECT $1, $2, $3, $4, $5, gp.groupid, $7, to_timestamp($8), $9
-        FROM groups AS gp
-        WHERE gp.groupname = $6
+      `INSERT INTO matches (match_id, player1, player2, score1, score2, groupid,
+        finished, addedwhen, addedbyuser, reversed)
+      SELECT $1, $2, $3, $4, $5, gp.groupid, $7, NOW(), $8, $9
+      FROM groups AS gp
+      WHERE gp.groupname = $6
       ON CONFLICT (match_id) DO UPDATE
       SET score1 = $4, score2 = $5, finished = $7
       RETURNING *`,
-      [match_id, player1, player2, score1, score2, groupname, finished, addedwhen, addedbyuser]
+      [match_id, player1, player2, score1, score2, groupname, finished, addedbyuser, reversed]
     )
     res.json(newMatch.rows[0])
   } catch (e) {

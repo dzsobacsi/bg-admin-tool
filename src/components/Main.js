@@ -3,11 +3,17 @@ import Button from 'react-bootstrap/Button'
 import GroupTable from './GroupTable'
 import NewGroupForm from './NewGroupForm'
 import NewMatchForm from './NewMatchForm'
+import AddByBatchForm from './AddByBatchForm'
 import Results from './Results'
 import Summary from './Summary'
 import Filter from './Filter'
 import dbService from '../services/services'
-import { getPlayerIds } from '../services/helperfunctions'
+import {
+  getMatchResultsFromDg,
+  processResultObjects,
+  swapResult,
+  saveMatchesToDb,
+} from '../services/helperfunctions'
 
 
 const Main = ({ setNotifMessage, adminMode }) => {
@@ -29,54 +35,36 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
   const refreshResults = async () => {
     setNotifMessage('Please wait...')
-    let changedMatches = [] // I could call this NextStateUpdatedMatches but it is shorter this way :)
-    let nextStateMatches = [...matches]
-    let nextStateGroups = [...groups]
 
     // match IDs of unfinised matches are:
     const unfinishedMatches = matches
       .filter(m => !m.finished)
       .map(m => m.match_id)
 
-    // fetch results of all the unfinised matches
-    const matchResultPromises = unfinishedMatches
-      .map(mid => dbService.getMatchResult(mid))
+    let results = await getMatchResultsFromDg(unfinishedMatches)
+    results = await processResultObjects(results)
+    if (!results) {
+      setNotifMessage('Something went wrong. Please, try again.')
+      return
+    }
 
-    let results = await Promise.all(matchResultPromises)
+    // If a match result is reversed in the DB, then it has to be reversed in
+    // the results array as well
+    results = results.map(r => {
+      let newRes = { ...r }
+      const currentMatch = matches.find(m => m.match_id === r.mid) // currentMatch is taken from the matches state
+      if (currentMatch.reversed) {
+        newRes = swapResult(newRes)
+      }
+      return newRes
+    })
 
+    // find and save the changed matches
+    const changedMatches = []
     results.forEach(r => {
-      // currentMatch is taken from the matches state
       const currentMatch = matches.find(m => m.match_id === r.mid)
-      let toReverse = false
-
-      // If the match result changed since last update
       if (currentMatch.score1 !== r.score[0] || currentMatch.score2 !== r.score[1]) {
         changedMatches.push(r.mid)
-
-        // if players are stored in the database in reversed order,
-        // they have to be reveresed here too
-        const playersInDb = [currentMatch.player1, currentMatch.player2]
-        const playersFromDg = r.players
-        if (JSON.stringify(playersInDb) !== JSON.stringify(playersFromDg)) {
-          console.warn(`I have to reverse ${playersInDb[0]} and ${playersInDb[1]}`)
-          toReverse = true
-        }
-
-        const updatedMatch = {
-          match_id: r.mid,
-          player1: toReverse ? r.players[1] : r.players[0],
-          player2: toReverse ? r.players[0] : r.players[1],
-          score1:  toReverse ? r.score[1]   : r.score[0],
-          score2:  toReverse ? r.score[0]   : r.score[1],
-          finished: r.finished
-        }
-        //console.log('result: ', r)
-        //console.log('toReverse: ', toReverse)
-        console.log('updatedMatch: ', updatedMatch)
-        //console.log('---------------------')
-
-        nextStateMatches = nextStateMatches
-          .map(m => m.match_id === r.mid ? updatedMatch : m)
       }
     })
 
@@ -84,76 +72,38 @@ const Main = ({ setNotifMessage, adminMode }) => {
     results = results.filter(r => changedMatches.includes(r.mid))
     console.log('changed matches: ', results)
 
-    // This block replaces usernames with user IDs
-    let playersSet = new Set()
-    results.forEach(m => {
-      playersSet.add(m.players[0])
-      playersSet.add(m.players[1])
-    })
-
-    const userNames = [...playersSet]
-    if (userNames.some(un => typeof un === 'undefined')) {
-      console.error('Some usernames are undefined')
-      setNotifMessage('Something went wrong. Please, try again.')
-      return
-    }
-
-    const playerIds = await getPlayerIds(userNames)
-    if (playerIds.some(pid => typeof pid === 'undefined')) {
-      console.error('Some player IDs are undefined')
-      setNotifMessage('Something went wrong. Please, try again.')
-      return
-    }
-
-    let players = {}
-    userNames.forEach((un, i) => players[un] = playerIds[i])
-
-    results = results.map(r => ({
-      ...r,
-      players: r.players.map(p => players[p])
-    }))
-
     // Save updated matches to the database
-    const saveRequestPromises = results
-      .map(r => dbService.saveResultToDb(r, selectedGroup))
+    const savedMatchResults = await saveMatchesToDb(results, selectedGroup)
+    console.log('saved results: ', savedMatchResults)
 
-    const savedMatchResults = await Promise.all(saveRequestPromises)
-    console.log('saved results', savedMatchResults)
-    setNotifMessage(
-      `${savedMatchResults.length} match${savedMatchResults.length > 1 ? 'es were' : ' was'} changed and saved to the database.`
-    )
+    const nextStateMatches = await dbService.getGroupMatches(selectedGroup)
 
     // Check if all the matches are finished
     // and update the group table if they are
+    // In any case, the group is saved back to the DB, to refresh its date
     const groupIsFinished = nextStateMatches.every(m => m.finished)
     const groupToUpdate = groups.find(g => g.groupname === selectedGroup)
-    let updatedGroup
+    const updatedGroup  = { ...groupToUpdate }
 
     if (groupIsFinished) {
       console.log('Group is finished!')
-      updatedGroup = {
-        ...groupToUpdate,
-        winner: topPlayer,
-        username: topPlayer,
-        finished: true,
-        date: Math.floor(Date.now() / 1000)
-      }
-    } else {
-      updatedGroup = {
-        ...groupToUpdate,
-        date: Math.floor(Date.now() / 1000)
-      }
+      updatedGroup.winner = topPlayer
+      updatedGroup.finished = true
     }
-    const savedGroup = await dbService.saveGroupToDb(updatedGroup)
-    console.log('savedGroup', savedGroup)
 
-    nextStateGroups = nextStateGroups
+    const savedGroup = await dbService.saveGroupToDb(updatedGroup)
+    console.log('savedGroup: ', savedGroup)
+
+    const nextStateGroups = groups
       .map(g => g.groupname === selectedGroup ? updatedGroup : g)
 
     setGroups(nextStateGroups)
     setMatches(nextStateMatches)
     setUpdatedMatches(changedMatches)
     setLastUpdate(new Date().toString())
+    setNotifMessage(
+      `${savedMatchResults.length} match${savedMatchResults.length > 1 ? 'es were' : ' was'} changed and saved to the database.`
+    )
   }
 
   const handleFilterChange = e => setGroupFilter(e.target.value)
@@ -181,18 +131,32 @@ const Main = ({ setNotifMessage, adminMode }) => {
                 </>
               }
             </div><br/>
-            <Button
-              variant='outline-success'
-              onClick={() => setFormVisible('new-group')}
-              disabled={!adminMode}>
-              Add group
-            </Button>&nbsp;
-            <Button
-              variant='outline-success'
-              onClick={() => setFormVisible('new-match')}
-              disabled={!adminMode}>
-              Add match
-            </Button>
+            {adminMode &&
+              <Button
+                variant='outline-success'
+                onClick={() => setFormVisible('new-group')}
+              >
+                Add group - player names
+              </Button>
+            }
+            &nbsp;
+            {adminMode &&
+              <Button
+                variant='outline-success'
+                onClick={() => setFormVisible('add-by-batch')}
+              >
+                Add group - match IDs
+              </Button>
+            }
+            &nbsp;
+            {adminMode &&
+              <Button
+                variant='outline-success'
+                onClick={() => setFormVisible('new-match')}
+              >
+                Add match
+              </Button>
+            }
           </div>
         }
         {formVisible === 'new-group' &&
@@ -211,7 +175,18 @@ const Main = ({ setNotifMessage, adminMode }) => {
             setFormVisible={setFormVisible}
             matches={matches}
             setMatches={setMatches}
+            selectedGroup={selectedGroup}
+            setNotifMessage={setNotifMessage}
+          />
+        }
+        {formVisible === 'add-by-batch' &&
+          <AddByBatchForm
+            setFormVisible={setFormVisible}
+            setMatches={setMatches}
             groups={groups}
+            setGroups={setGroups}
+            setSelectedGroup={setSelectedGroup}
+            setLastUpdate={setLastUpdate}
             setNotifMessage={setNotifMessage}
           />
         }

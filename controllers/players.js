@@ -6,8 +6,6 @@ const bcrypt = require('bcrypt')
 // add a player to the database
 // or update it whith passwordhash and email address
 // Takes: username*, password, email
-
-// This is currently not used for anything
 playersRouter.post('/', async (req, res) => {
   const client = await pool.connect()
   try {

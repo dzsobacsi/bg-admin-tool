@@ -2,7 +2,16 @@ import React from 'react'
 import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
 import dbService from '../services/services'
-import { getPlayerIds } from '../services/helperfunctions'
+import {
+  getPlayerIds,
+  missingPlayersFrom,
+  registerPlayers,
+  getMatchIds,
+  getMatchResultsFromDg,
+  processResultObjects,
+  handleDuplicates,
+  saveMatchesToDb,
+} from '../services/helperfunctions'
 
 const NewGroupForm = ({
   setFormVisible,
@@ -25,100 +34,47 @@ const NewGroupForm = ({
       .filter(i => i.length)
     console.log(userNames)
 
-    // get all playerIds
+    const missingPlayers = await missingPlayersFrom(userNames)
+    if (missingPlayers.length) {
+      const savedPlayers = await registerPlayers(missingPlayers)
+      console.log('The following players were saved to the database')
+      console.log(savedPlayers)
+    }
+
     let playerIds = await getPlayerIds(userNames)
     console.log(playerIds)
 
-    // Check if some of the playerIds are undefined, check them in DG
-    // and add the missing players to the database
-    if (playerIds.includes(undefined)) {
-      let missingPlayers = []
-      for (let i = 0; i < playerIds.length; i++) {
-        if (!playerIds[i]) missingPlayers.push(userNames[i])
-      }
-
-      const registerPromises = missingPlayers
-        .map(pl => dbService.register({ username: pl }))
-      await Promise.all(registerPromises)
-      playerIds = await getPlayerIds(userNames)
-      if (playerIds.includes(undefined)) {
-        console.warn('Some of the given players do not exist on DailyGammon!')
-      }
-      playerIds = playerIds.filter(pid => pid !== undefined)
-    }
-
-    // Create an object in which usernames the key a payerIds the value
-    // Would it bring any benefit to use Map instead of an object?
-    let players = {}
-    userNames.forEach((un, i) => players[un] = playerIds[i])
-    console.log(players)
-
-    //fetch match IDs
-    // getMatchIds returns an object like { matchIds: [] }
-    const matchIdPromises = playerIds
-      .map(pid => dbService.getMatchIds(pid, groupName))
-    let matchIds = await Promise.all(matchIdPromises)
-    matchIds = matchIds.map(x => x.matchIds).flat() // flat is not supported in IE
-    matchIds = [...new Set(matchIds)] // to remove duplicates
+    const matchIds = await getMatchIds(playerIds, groupName)
     console.log(matchIds)
 
     //fetch match results
-    const matchResultPromises = matchIds
-      .map(mid => dbService.getMatchResult(mid))
-    let results = await Promise.all(matchResultPromises)
+    let results = await getMatchResultsFromDg(matchIds)
     results = results.filter(
-      r => userNames.includes(r.players[0]) && userNames.includes(r.players[1])
+      r => userNames.includes(r.playerNames[0]) && userNames.includes(r.playerNames[1])
     )
-
-    // This block replaces usernames with user IDs
-    results = results.map(r => {
-      let newRes = { ...r }
-      newRes.players = r.players.map(p => players[p])
-      return newRes
-    })
+    results = await processResultObjects(results)
+    if (!results) {
+      setNotifMessage('Something went wrong. Please, try again.')
+      return
+    }
     console.log(results)
 
-    //check if number of matches is n * (n - 1)
-    const expectedNrOfMatches = playerIds.length * (playerIds.length - 1)
-    if (results.length !== expectedNrOfMatches) {
-      console.warn('The number of matches does not fit to the number of players')
-    }
-
-    //check for duplicates in the player arrays
-    let seen = []
-    results.forEach((r, i) => {
-      if (seen.includes(JSON.stringify(r.players))) {
-        console.warn(`The palyers of the match ${JSON.stringify(r)}
-also have another match with each other. Their order is replaced`)
-        results[i].players.reverse()
-        results[i].score.reverse()
-        seen.push(JSON.stringify(r.players))
-      } else {
-        seen.push(JSON.stringify(r.players))
-      }
-    })
+    results = handleDuplicates(results)
 
     //save the group and the match results to the database
+    const expectedNrOfMatches = playerIds.length * (playerIds.length - 1)
     if (results.length && window.confirm(
       `${playerIds.length} out of ${userNames.length} users were found.
 ${results.length} out of ${expectedNrOfMatches} matches were found.
 Do you want to save the results to the database?`
     )) {
       // save the new group to the database
-      const groupToSave = {
-        groupname: groupName,
-        season: parseInt(groupName.slice(0, 2)), // This maybe necessary to updated if we use different group names in the future
-        date: Math.floor(Date.now() / 1000)
-      }
-      const addedGroup = await dbService.saveGroupToDb(groupToSave)
+      const addedGroup = await dbService.saveGroupToDb({ groupname: groupName })
       console.log(addedGroup)
 
       // save the results to the database
-      const saveRequestPromises = results
-        .map(r => dbService.saveResultToDb(r, groupName))
-      const savedMatchResults = await Promise.all(saveRequestPromises)
+      const savedMatchResults = await saveMatchesToDb(results, groupName)
       console.log(savedMatchResults)
-      console.log('Match results are saved to the database')
 
       const matches = await dbService.getGroupMatches(groupName)
       setMatches(matches)
