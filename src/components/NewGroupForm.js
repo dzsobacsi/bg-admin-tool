@@ -11,6 +11,7 @@ import {
   processResultObjects,
   handleDuplicates,
   saveMatchesToDb,
+  seasonFromGroupName,
 } from '../services/helperfunctions'
 
 const NewGroupForm = ({
@@ -69,7 +70,10 @@ ${results.length} out of ${expectedNrOfMatches} matches were found.
 Do you want to save the results to the database?`
     )) {
       // save the new group to the database
-      const addedGroup = await dbService.saveGroupToDb({ groupname: groupName })
+      const addedGroup = await dbService.saveGroupToDb({
+        groupname: groupName,
+        season: seasonFromGroupName(groupName),
+      })
       console.log(addedGroup)
 
       // save the results to the database

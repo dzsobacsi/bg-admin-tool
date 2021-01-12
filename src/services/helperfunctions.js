@@ -120,3 +120,11 @@ export const saveMatchesToDb = async (results, groupName) => {
     .map(r => dbService.saveResultToDb(r, groupName))
   return await Promise.all(saveRequestPromises)
 }
+
+// takes a groupname
+// returns a season number in Int if the begining of the gpname is a number
+// returns null otherwise
+export const seasonFromGroupName = gpname => {
+  const season = parseInt(gpname.substring(0,2))
+  return season ? season : null
+}

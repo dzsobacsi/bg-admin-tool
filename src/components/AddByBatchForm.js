@@ -7,6 +7,7 @@ import {
   processResultObjects,
   handleDuplicates,
   saveMatchesToDb,
+  seasonFromGroupName,
 } from '../services/helperfunctions'
 
 const AddByBatchForm = ({
@@ -37,7 +38,10 @@ const AddByBatchForm = ({
       `Do you want to save the group ${groupName} and ${results.length} matches to the database?`
     )) {
       // save the new group to the database
-      const addedGroup = await dbService.saveGroupToDb({ groupname: groupName })
+      const addedGroup = await dbService.saveGroupToDb({
+        groupname: groupName,
+        season: seasonFromGroupName(groupName),
+      })
       console.log(addedGroup)
 
       // save the results to the database
