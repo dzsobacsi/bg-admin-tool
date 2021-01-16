@@ -45,9 +45,8 @@ export const processResultObjects = async results => {
     playersSet.add(m.playerNames[1])
   })
   const userNames = [...playersSet]
-  if (userNames.some(un => typeof un === 'undefined')
-    || playerIds.some(pid => typeof pid === 'undefined')) {
-    console.error('The fetched results contain undefined or unknown usernames')
+  if (userNames.some(un => typeof un === 'undefined')) {
+    console.error('The fetched results contain undefined usernames')
     return false
   }
 
