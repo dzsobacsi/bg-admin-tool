@@ -45,13 +45,13 @@ export const processResultObjects = async results => {
     playersSet.add(m.playerNames[1])
   })
   const userNames = [...playersSet]
-  const playerIds = await getPlayerIds(userNames)
-
   if (userNames.some(un => typeof un === 'undefined')
     || playerIds.some(pid => typeof pid === 'undefined')) {
     console.error('The fetched results contain undefined or unknown usernames')
     return false
   }
+
+  const playerIds = await getPlayerIds(userNames)
   const players = {}
   userNames.forEach((un, i) => players[un] = playerIds[i])
   return results.map(r => ({
