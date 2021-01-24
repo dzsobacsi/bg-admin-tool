@@ -66,6 +66,22 @@ describe('Players router', () => {
       expect(res.body.registeredwhen).not.toBeNull()
     })
 
+    it('updates an existing user if a password and an email address is specified', async () => {
+      const res = await request
+        .post('/players')
+        .send({ username: 'Uforobban', password: 'abcdefg', email: 'uforobban@gmail.com' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toHaveProperty('user_id', 'username', 'passwordhash', 'administrator', 'email', 'registeredwhen')
+      expect(res.body.user_id).toBe(33328)
+      expect(res.body.username).toBe('Uforobban')
+      expect(res.body.passwordhash).not.toBeNull()
+      expect(res.body.administrator).toBe(false)
+      expect(res.body.email).toBe('uforobban@gmail.com')
+      expect(res.body.registeredwhen).not.toBeNull()
+    })
+
     it('returns 400 and a message if the username is not specified', async () => {
       const res = await request
         .post('/players')

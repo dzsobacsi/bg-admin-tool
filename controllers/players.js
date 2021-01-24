@@ -37,7 +37,6 @@ playersRouter.post('/', async (req, res) => {
         res.status(400)
         res.send({ message: `Error: No user ${username} exists in DailyGammon.` })
         res.end()
-        //throw { message: user_id }
       }
     }
   } catch (e) {
