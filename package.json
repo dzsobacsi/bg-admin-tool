@@ -54,5 +54,8 @@
     "eslint-plugin-jest": "^24.1.0",
     "nodemon": "^2.0.4",
     "supertest": "^6.1.1"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }

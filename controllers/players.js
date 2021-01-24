@@ -11,28 +11,34 @@ playersRouter.post('/', async (req, res) => {
   try {
     const { username, password, email } = req.body
     if (!username) {
-      throw { message: 'Error: Cannot add a new player. Username is missing.' }
+      res.status(400)
+      res.send({ message: 'Error: Cannot add a new player. Username is missing.' })
+      res.end()
     }
+    else {
+      //user_id is a string-number if found and a text otherwise
+      const user_id = await dgQueries.getPlayerIdFromDg(username)
 
-    //user_id is a string-number if found and a text otherwise
-    const user_id = await dgQueries.getPlayerIdFromDg(username)
+      if (parseInt(user_id)) {  // if user_id can be converted to a number, i.e. the user exists in DG
+        const passwordHash = password
+          ? await bcrypt.hash(password, 10)
+          : null
 
-    if (parseInt(user_id)) {  // if user_id can be converted to a number, i.e. the user exists in DG
-      const passwordHash = password
-        ? await bcrypt.hash(password, 10)
-        : null
-
-      const newPlayer = await client.query(
-        `INSERT INTO players (user_id, username, passwordhash, administrator, email, registeredwhen)
-        VALUES ($1, $2, $3, false, $4, NOW())
-        ON CONFLICT (username) DO UPDATE
-        SET passwordhash = $3, email = $4, registeredwhen = NOW()
-        RETURNING *`,
-        [user_id, username, passwordHash, email]
-      )
-      res.json(newPlayer.rows[0])
-    } else {
-      throw { message: user_id }
+        const newPlayer = await client.query(
+          `INSERT INTO players (user_id, username, passwordhash, administrator, email, registeredwhen)
+          VALUES ($1, $2, $3, false, $4, NOW())
+          ON CONFLICT (username) DO UPDATE
+          SET passwordhash = $3, email = $4, registeredwhen = NOW()
+          RETURNING *`,
+          [user_id, username, passwordHash, email]
+        )
+        res.json(newPlayer.rows[0])
+      } else {
+        res.status(400)
+        res.send({ message: `Error: No user ${username} exists in DailyGammon.` })
+        res.end()
+        //throw { message: user_id }
+      }
     }
   } catch (e) {
     console.error('An error is catched in playersRouter.post')
@@ -57,7 +63,8 @@ playersRouter.get('/:username', async (req, res) => {
     if (dbRespnse.rows.length) {
       res.send(dbRespnse.rows[0])
     } else {
-      throw { message: `Error: There is no user ${req.params.username} in the database` }
+      res.status(404)
+      res.send({ message: `Error: There is no user ${req.params.username} in the database` })
     }
   } catch (e) {
     console.error('An error is catched in playersRouter.get')
