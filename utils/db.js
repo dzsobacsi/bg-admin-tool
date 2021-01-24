@@ -1,15 +1,25 @@
 const Pool = require('pg').Pool
 const config = require('./config')
 
-const connection = process.env.NODE_ENV === 'development'
-  ? {
+let connection
+if (config.NODE_ENV === 'development') {
+  connection = {
+    user: 'postgres',
+    host: 'localhost',
+    database: 'bg_development',
+    password: config.LOCAL_DB_PASSWORD,
+    port: 5432,
+  }
+} else if (config.NODE_ENV === 'test') {
+  connection = {
     user: 'postgres',
     host: 'localhost',
     database: 'bg_test',
     password: config.LOCAL_DB_PASSWORD,
     port: 5432,
   }
-  : {
+} else {
+  connection = {
     connectionString: config.DATABASE_URL,
     idleTimeoutMillis: 3000,
     connectionTimeoutMillis: 3000,
@@ -18,6 +28,7 @@ const connection = process.env.NODE_ENV === 'development'
       rejectUnauthorized: false
     }
   }
+}
 
 const pool = new Pool(connection)
 
