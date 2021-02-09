@@ -2,25 +2,44 @@ const groupsRouter = require('express').Router()
 const pool = require('../utils/db')
 
 // add a new group to the database
+// groupname and season are mandatory
+// winner is optional but if given, it must be a valid username
+// winner is received as the name of the winner, but saved as its ID
 groupsRouter.post('/', async (req, res) => {
-  const { groupname, finished, winner, season } = req.body
-  //console.log({ groupname, finished, winner })
-  // winner is received as the name of the winner, but saved as its ID
+  const { groupname, winner, season } = req.body
   const client = await pool.connect()
   try {
-    const groups = await client.query(
-      `INSERT INTO groups (groupname, season, lastupdate)
-      VALUES ($1, $4, NOW())
-      ON CONFLICT (groupname) DO UPDATE
-      SET finished = $2, lastupdate = NOW(), winner = (
-        SELECT user_id
-        FROM players
-        WHERE username = $3
-      )
-      RETURNING *`,
-      [groupname, finished || false, winner, season]
-    )
-    res.json(groups.rows[0])
+    if(!groupname || !season) {
+      res.status(400)
+      res.send({ message: 'Error: Cannot add a group. Groupname or season is missing' })
+      res.end()
+    } else {
+      let winnerId = null
+      if(winner) {
+        const dbResponse = await client.query(`
+          SELECT user_id
+          FROM players
+          WHERE username = $1;
+        `, [winner])
+        winnerId = dbResponse.rows.length
+          ? dbResponse.rows[0].user_id
+          : null
+      }
+      if(winner && !winnerId) {
+        res.status(400)
+        res.send({ message: 'Error: Cannot update the group with the given winner. nonexistinguser does not exist in the database.' })
+        res.end()
+      } else {
+        const groups = await client.query(`
+          INSERT INTO groups (groupname, season, lastupdate)
+          VALUES ($1, $4, NOW())
+          ON CONFLICT (groupname) DO UPDATE
+          SET finished = $2, lastupdate = NOW(), winner = $3
+          RETURNING *
+        `, [groupname, !!winnerId, winnerId, season])
+        res.json(groups.rows[0])
+      }
+    }
   } catch (e) {
     console.error('An error is catched in groupsRouter.post')
     console.error(e.message)
@@ -42,33 +61,6 @@ groupsRouter.get('/', async (req, res) => {
     res.json(groups.rows)
   } catch (e) {
     console.error('An error is catched in groupsRouter.get/groupnames')
-    console.error(e.message)
-  } finally {
-    client.release()
-  }
-})
-
-//get matches of a given group from the database
-groupsRouter.get('/matches', async (req, res) => {
-  const group = req.query.groupname
-  const client = await pool.connect()
-  try {
-    const matches = await client.query(
-      `SELECT mt.match_id, p1.username AS player1, p2.username AS player2,
-        mt.score1, mt.score2, mt.finished, mt.reversed, gp.lastupdate
-      FROM matches AS mt
-      LEFT JOIN players p1
-      ON mt.player1 = p1.user_id
-      LEFT JOIN players p2
-      ON mt.player2 = p2.user_id
-      LEFT JOIN groups gp
-      ON mt.groupid = gp.groupid
-      WHERE gp.groupname = $1`,
-      [group]
-    )
-    res.json(matches.rows)
-  } catch (e) {
-    console.error('An error is catched in groupsRouter.get/matches')
     console.error(e.message)
   } finally {
     client.release()

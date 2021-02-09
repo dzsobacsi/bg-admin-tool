@@ -50,7 +50,7 @@ const getMatchResult = async (mid) => {
 
 // get matches of a given group from the database
 const getGroupMatches = async groupname => {
-  const url = encodeUrl(baseUrl + `/groups/matches?groupname=${groupname}`)
+  const url = encodeUrl(baseUrl + `/matches?groupname=${groupname}`)
   try {
     const response = await axios.get(url)
     return response.data

@@ -39,6 +39,33 @@ matchesRouter.post('/', async (req, res) => {
   }
 })
 
+//get matches of a given group from the database
+matchesRouter.get('/', async (req, res) => {
+  const group = req.query.groupname
+  const client = await pool.connect()
+  try {
+    const matches = await client.query(
+      `SELECT mt.match_id, p1.username AS player1, p2.username AS player2,
+        mt.score1, mt.score2, mt.finished, mt.reversed, gp.lastupdate
+      FROM matches AS mt
+      LEFT JOIN players p1
+      ON mt.player1 = p1.user_id
+      LEFT JOIN players p2
+      ON mt.player2 = p2.user_id
+      LEFT JOIN groups gp
+      ON mt.groupid = gp.groupid
+      WHERE gp.groupname = $1`,
+      [group]
+    )
+    res.json(matches.rows)
+  } catch (e) {
+    console.error('An error is catched in groupsRouter.get/matches')
+    console.error(e.message)
+  } finally {
+    client.release()
+  }
+})
+
 // get match IDs acc. to user id and event name from dailygammon
 matchesRouter.get('/matchid', async (req, res) => {
   const { uid, event } = req.query

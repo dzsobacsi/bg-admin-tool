@@ -9,6 +9,8 @@ beforeAll(async () => {
   await initDatabase()
 })
 
+// PLAYERS
+
 describe('Players router', () => {
   describe('GET - /players/:username', () => {
     it('fetches a user if a valid username is specified', async () => {
@@ -50,7 +52,7 @@ describe('Players router', () => {
       expect(res.body.registeredwhen).not.toBeNull()
     })
 
-    it('adds a new player to the DB if a username, a password and an email address is specified', async () => {
+    it('adds a new player to the DB if a username, a password and an email address are specified', async () => {
       const res = await request
         .post('/players')
         .send({ username: 'institute', password: '123456', email: 'institute@gmail.com' })
@@ -66,7 +68,7 @@ describe('Players router', () => {
       expect(res.body.registeredwhen).not.toBeNull()
     })
 
-    it('updates an existing user if a password and an email address is specified', async () => {
+    it('updates an existing user if username, password and an email address are specified', async () => {
       const res = await request
         .post('/players')
         .send({ username: 'Uforobban', password: 'abcdefg', email: 'uforobban@gmail.com' })
@@ -100,6 +102,91 @@ describe('Players router', () => {
         .expect('Content-Type', /application\/json/)
 
       expect(res.body.message).toBe('Error: No user nonexistinguser exists in DailyGammon.')
+    })
+  })
+})
+
+// GROUPS
+
+describe('Groups router', () => {
+  describe('GET - /groups', () => {
+    it('fetches all groups from the DB', async () => {
+      const res = await request
+        .get('/groups')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toHaveLength(2)
+      expect(res.body[0]).toHaveProperty('groupname', 'groupid', 'finished', 'winner', 'season', 'lastupdate')
+      expect(res.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ groupname: '17th champ L1' })
+        ])
+      )
+    })
+  })
+
+  describe('POST - /groups', () => {
+    it('adds a new group to the DB if the groupname and the season are specified', async () => {
+      const res = await request
+        .post('/groups')
+        .send({ groupname: '17th champ L3', season: 17 })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toHaveProperty('groupname', 'groupid', 'finished', 'winner', 'season', 'lastupdate')
+      expect(res.body.groupname).toBe('17th champ L3')
+      expect(res.body.groupid).not.toBeNull()
+      expect(res.body.finished).toBe(false)
+      expect(res.body.winner).toBeNull()
+      expect(res.body.season).toBe(17)
+      expect(res.body.lastupdate).not.toBeNull()
+    })
+
+    it('updates an existing group if groupname, winner and season are specified', async () => {
+      const res = await request
+        .post('/groups')
+        .send({ groupname: '17th champ L1', winner: 'oldehippy', season: 17 })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toHaveProperty('groupname', 'groupid', 'finished', 'winner', 'season', 'lastupdate')
+      expect(res.body.groupname).toBe('17th champ L1')
+      expect(res.body.groupid).toBe(1)
+      expect(res.body.finished).toBe(true)
+      expect(res.body.winner).toBe(1070) //notice the difference
+      expect(res.body.season).toBe(17)
+      expect(res.body.lastupdate).not.toBeNull()
+    })
+
+    it('returns 400 and a message if groupname is not specified', async () => {
+      const res = await request
+        .post('/groups')
+        .send({ season: 17 })
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body.message).toBe('Error: Cannot add a group. Groupname or season is missing')
+    })
+
+    it('returns 400 and a message if season is not specified', async () => {
+      const res = await request
+        .post('/groups')
+        .send({ groupname: '17th champ L4' })
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body.message).toBe('Error: Cannot add a group. Groupname or season is missing')
+    })
+
+    it('returns 400 and a message if winner is not a valid username', async () => {
+      const res = await request
+        .post('/groups')
+        .send({ groupname: '17th champ L2', winner: 'nonexistinguser', season: 17 })
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body.message).toBe('Error: Cannot update the group with the given winner. nonexistinguser does not exist in the database.')
     })
   })
 })
