@@ -27,5 +27,7 @@ yarn-error.log*
 todo
 devnotes
 
+.eslintcache
+
 # not used anymore
 /controllers/dgLogin.js
