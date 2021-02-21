@@ -1,5 +1,6 @@
 const supertest = require('supertest')
 const app = require('../app')
+//const encodeUrl = require('encodeurl')
 const pool = require('../utils/db')
 const initDatabase = require('./initTestDb')
 
@@ -19,8 +20,11 @@ describe('Players router', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(res.body).toHaveProperty('user_id', 'username', 'registered', 'administrator')
-      expect(res.body.username).toBe('oldehippy')
+      expect(res.body).toEqual(expect.objectContaining({
+        user_id: 1070,
+        username: 'oldehippy',
+        administrator: false
+      }))
     })
 
     it('returns 404 and a message if the user does not exists in the DB', async () => {
@@ -43,7 +47,6 @@ describe('Players router', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(res.body).toHaveProperty('user_id', 'username', 'passwordhash', 'administrator', 'email', 'registeredwhen')
       expect(res.body.user_id).toBe(16278)
       expect(res.body.username).toBe('oregammon')
       expect(res.body.passwordhash).toBeNull()
@@ -59,7 +62,6 @@ describe('Players router', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(res.body).toHaveProperty('user_id', 'username', 'passwordhash', 'administrator', 'email', 'registeredwhen')
       expect(res.body.user_id).toBe(19228)
       expect(res.body.username).toBe('institute')
       expect(res.body.passwordhash).not.toBeNull()
@@ -75,7 +77,6 @@ describe('Players router', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(res.body).toHaveProperty('user_id', 'username', 'passwordhash', 'administrator', 'email', 'registeredwhen')
       expect(res.body.user_id).toBe(33328)
       expect(res.body.username).toBe('Uforobban')
       expect(res.body.passwordhash).not.toBeNull()
@@ -117,10 +118,14 @@ describe('Groups router', () => {
         .expect('Content-Type', /application\/json/)
 
       expect(res.body).toHaveLength(2)
-      expect(res.body[0]).toHaveProperty('groupname', 'groupid', 'finished', 'winner', 'season', 'lastupdate')
       expect(res.body).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ groupname: '17th champ L1' })
+          expect.objectContaining({
+            groupname: '17th champ L1',
+            finished: false,
+            season: 17,
+            winner: null
+          })
         ])
       )
     })
@@ -134,7 +139,6 @@ describe('Groups router', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(res.body).toHaveProperty('groupname', 'groupid', 'finished', 'winner', 'season', 'lastupdate')
       expect(res.body.groupname).toBe('17th champ L3')
       expect(res.body.groupid).not.toBeNull()
       expect(res.body.finished).toBe(false)
@@ -150,7 +154,6 @@ describe('Groups router', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(res.body).toHaveProperty('groupname', 'groupid', 'finished', 'winner', 'season', 'lastupdate')
       expect(res.body.groupname).toBe('17th champ L1')
       expect(res.body.groupid).toBe(1)
       expect(res.body.finished).toBe(true)
@@ -188,6 +191,127 @@ describe('Groups router', () => {
 
       expect(res.body.message).toBe('Error: Cannot update the group with the given winner. nonexistinguser does not exist in the database.')
     })
+  })
+})
+
+// MATCHES
+
+describe('Matches router', () => {
+  describe('GET - /matches/:id', () => {
+    it('fetches match result from DailyGammon', async () => {
+      const res = await request
+        .get('/matches/4338029')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toStrictEqual({
+        mid: 4338029,
+        finished: true,
+        playerNames: ['dzsobacsi', 'JHD'],
+        score: [11, 6]
+      })
+    })
+
+    it('returns 404 and an error message in case of invalid match ID', async () => {
+      const res = await request
+        .get('/matches/99999999')
+        .expect(404)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toStrictEqual({
+        message: 'Error: Match result could not fetched from DailyGammon - probably due to an invalid match ID.'
+      })
+    })
+  })
+
+  describe('GET - /matches/matchids?uid=<user_id>&event=<group_name>', () => {
+    it('fetches all match IDs from DailyGammon corresponding to a given user and a given event', async () => {
+      const res = await request
+        .get('/matches/matchids?uid=31952&event=17th%20championship%20League%201a')  // careful, matches older than 150 day will not be found
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body.matchIds).toHaveLength(18)
+      expect(res.body.matchIds.map(x => parseInt(x)))
+        .toEqual(expect.not.arrayContaining([NaN]))
+    })
+
+    it('returns 404 and an error message in case of wrong parameters', async () => {
+      const res = await request
+        .get('/matches/matchids?uid=31952&event=nonexistingevent')
+        .expect(404)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toStrictEqual({
+        message: 'Error: No matches for 31952 and nonexistingevent'
+      })
+    })
+  })
+
+  describe('GET - /matches?groupname=<group_name>', () => {
+    it('fetches all matches of a given group from the database', async () => {
+      const res = await request
+        .get('/matches?groupname=17th%20champ%20L1')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toHaveLength(3)
+      expect(res.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            match_id: 1,
+            player1: 'oldehippy',
+            player2: 'Uforobban',
+            score1: 7,
+            score2: 8,
+            finished: false,
+            reversed: false
+          })
+        ])
+      )
+    })
+
+    it('returns 404 and an error message if the given group name does not exist', async () => {
+      const res = await request
+        .get('/matches?groupname=nonexistinggroup')
+        .expect(404)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body.message).toBe('Error: There are no matches in the database in group nonexistinggroup')
+    })
+  })
+
+  describe('POST - /matches', () => {
+    it('adds a match to the database if all parameters are well specified', async () => {
+      const res = await request
+        .post('/matches')
+        .send({
+          match_id: 4,
+          player1: 33328,
+          player2: 1070,
+          score1: 11,
+          score2: 10,
+          groupname: '17th champ L1',
+          finished: true,
+          addedbyuser: 1070,
+          reversed: false
+        })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toEqual(expect.objectContaining({
+        match_id: 4,
+        player1: 33328,
+        player2: 1070,
+        score1: 11,
+        score2: 10,
+        groupid: 1,
+        finished: true,
+        addedbyuser: 1070,
+      }))
+    })
+
+    //it('returns some error otherwise')
   })
 })
 

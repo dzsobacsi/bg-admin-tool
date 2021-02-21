@@ -57,11 +57,9 @@ const getMatchIdsFromDg = async (uid, event) => {
         matchIds.push($(e).attr('href'))
       })
     matchIds = matchIds.map(x => x.split('/')[3])
-    if (matchIds.length) {
-      return matchIds
-    } else {
-      return `No matches for ${uid} and ${event}`
-    }
+    return matchIds.length
+      ? matchIds
+      : `Error: No matches for ${uid} and ${event}`
   } catch (e) {
     console.error('Could not fetch match ID from dailygammon')
     console.error(e.message)
@@ -121,12 +119,16 @@ const getMatchResultFromDg = async (mid) => {
       score[winner] = 11
     }
 
-    return {
+    const result = {
       mid: parseInt(mid),
-      playerNames: players,
       finished,
+      playerNames: players,
       score
     }
+
+    return result.score.length
+      ? result
+      : { message: 'Error: Match result could not fetched from DailyGammon - probably due to an invalid match ID.' }
 
   } catch (e) {
     console.error('Could not fetch match result from dailygammon')

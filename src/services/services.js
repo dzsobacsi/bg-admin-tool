@@ -26,7 +26,7 @@ const getUser = async (username) => {
 }
 
 const getMatchIds = async (uid, event) => {
-  let url = encodeUrl(baseUrl + `/matches/matchid?uid=${uid}&event=${event}`)
+  let url = encodeUrl(baseUrl + `/matches/matchids?uid=${uid}&event=${event}`)
   try {
     const response = await axios.get(url)
     return response.data
