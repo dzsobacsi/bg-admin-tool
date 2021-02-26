@@ -19,7 +19,7 @@ matchesRouter.post('/', async (req, res) => {
       addedbyuser,
       reversed
     } = req.body
-    if(!(match_id && player1 && player2 && score1 && score2 && groupname && finished && reversed)) {
+    if(!(match_id && player1 && player2 && score1 && score2 && groupname && typeof finished !== 'undefined' && typeof reversed !== 'undefined')) {
       res.status(400)
       res.json({ message: 'Error: Could not save the match to the database. Some of the required paramaters are missing' })
     } else {

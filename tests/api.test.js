@@ -231,7 +231,7 @@ describe('Matches router', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(res.body.matchIds).toHaveLength(18)
+      expect(res.body.matchIds).toHaveLength(19)
       expect(res.body.matchIds.map(x => parseInt(x)))
         .toEqual(expect.not.arrayContaining([NaN]))
     })
