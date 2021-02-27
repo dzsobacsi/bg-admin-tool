@@ -1,8 +1,10 @@
 const supertest = require('supertest')
 const app = require('../app')
-//const encodeUrl = require('encodeurl')
+const nock = require('nock')
 const pool = require('../utils/db')
 const initDatabase = require('./initTestDb')
+const fs = require('fs')
+const path = require('path')
 
 const request = supertest(app)
 
@@ -14,7 +16,7 @@ beforeAll(async () => {
 
 describe('Players router', () => {
   describe('GET - /players/:username', () => {
-    it('fetches a user if a valid username is specified', async () => {
+    it('fetches a user from the DB if a valid username is specified', async () => {
       const res = await  request
         .get('/players/oldehippy')
         .expect(200)
@@ -41,6 +43,11 @@ describe('Players router', () => {
 
   describe('POST - /players', () => {
     it('adds a new player to the DB if only the username is specified', async () => {
+      /*const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGuserlist-oregammon.html'))
+      nock('http://dailygammon.com')
+        .post('/bg/plist?like=oregammon&type=name')
+        .reply(200, mockedResponse)*/
+
       const res = await request
         .post('/players')
         .send({ username: 'oregammon' })
@@ -199,35 +206,49 @@ describe('Groups router', () => {
 describe('Matches router', () => {
   describe('GET - /matches/:id', () => {
     it('fetches match result from DailyGammon', async () => {
-      const res = await request
+      const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGmatch-4338029.html'))
+      nock('http://dailygammon.com')
+        .get('/bg/game/4338029/0/list')
+        .reply(200, mockedResponse)
+
+      await request
         .get('/matches/4338029')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-
-      expect(res.body).toStrictEqual({
-        mid: 4338029,
-        finished: true,
-        playerNames: ['dzsobacsi', 'JHD'],
-        score: [11, 6]
-      })
+        .expect({
+          mid: 4338029,
+          finished: true,
+          playerNames: ['dzsobacsi', 'JHD'],
+          score: [11, 6]
+        })
     })
 
     it('returns 404 and an error message in case of invalid match ID', async () => {
-      const res = await request
-        .get('/matches/99999999')
+      const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGmatch-9999999.html'))
+      nock('http://dailygammon.com')
+        .get('/bg/game/9999999/0/list')
+        .reply(200, mockedResponse)
+
+      await request
+        .get('/matches/9999999')
         .expect(404)
         .expect('Content-Type', /application\/json/)
-
-      expect(res.body).toStrictEqual({
-        message: 'Error: Match result could not fetched from DailyGammon - probably due to an invalid match ID.'
-      })
+        .expect({
+          message: 'Error: Match result could not fetched from DailyGammon - probably due to an invalid match ID.'
+        })
     })
   })
 
   describe('GET - /matches/matchids?uid=<user_id>&event=<group_name>', () => {
+    const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGusermatches-31952.html'))
+
     it('fetches all match IDs from DailyGammon corresponding to a given user and a given event', async () => {
+      nock('http://dailygammon.com')
+        .get('/bg/user/31952?days_to_view=150&active=1&finished=1')
+        .reply(200, mockedResponse)
+
       const res = await request
-        .get('/matches/matchids?uid=31952&event=17th%20championship%20League%201a')  // careful, matches older than 150 day will not be found
+        .get('/matches/matchids?uid=31952&event=17th%20championship%20League%201a')
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
@@ -237,14 +258,17 @@ describe('Matches router', () => {
     })
 
     it('returns 404 and an error message in case of wrong parameters', async () => {
-      const res = await request
+      nock('http://dailygammon.com')
+        .get('/bg/user/31952?days_to_view=150&active=1&finished=1')
+        .reply(200, mockedResponse)
+
+      await request
         .get('/matches/matchids?uid=31952&event=nonexistingevent')
         .expect(404)
         .expect('Content-Type', /application\/json/)
-
-      expect(res.body).toStrictEqual({
-        message: 'Error: No matches for 31952 and nonexistingevent'
-      })
+        .expect({
+          message: 'Error: No matches for 31952 and nonexistingevent'
+        })
     })
   })
 
@@ -299,7 +323,7 @@ describe('Matches router', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      expect(res.body).toEqual(expect.objectContaining({
+      expect(res.body).toMatchObject({
         match_id: 4,
         player1: 33328,
         player2: 1070,
@@ -308,10 +332,48 @@ describe('Matches router', () => {
         groupid: 1,
         finished: true,
         addedbyuser: 1070,
-      }))
+      })
     })
 
-    //it('returns some error otherwise')
+    it('returns 400 and a message if match_id is not specified', async () => {
+      await request
+        .post('/matches')
+        .send({
+          player1: 33328,
+          player2: 1070,
+          score1: 11,
+          score2: 10,
+          groupname: '17th champ L1',
+          finished: true,
+          addedbyuser: 1070,
+          reversed: false
+        })
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+        .expect({
+          message: 'Error: Could not save the match to the database. Some of the required paramaters are missing'
+        })
+    })
+
+    it('returns 400 and a message if finished is not specified', async () => {
+      await request
+        .post('/matches')
+        .send({
+          match_id: 4,
+          player1: 33328,
+          player2: 1070,
+          score1: 11,
+          score2: 10,
+          groupname: '17th champ L1',
+          addedbyuser: 1070,
+          reversed: false
+        })
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+        .expect({
+          message: 'Error: Could not save the match to the database. Some of the required paramaters are missing'
+        })
+    })
   })
 })
 

@@ -17,10 +17,13 @@ const getPlayerIdFromDg = async (username) => {
       url,
       headers: header
     })
+    console.log(response.data)
     const $ = cheerio.load(response.data)
     const userLinks = $('[href^=\'/bg/user/\']')
+    console.log(userLinks)
     if (userLinks.length !== 1) {
       if (!userLinks.length) {
+        console.log('No userlinks')
         return `There is no user: ${username}`
       } else {
         console.warn(
@@ -29,6 +32,7 @@ const getPlayerIdFromDg = async (username) => {
       }
     }
     const userLink = userLinks.attr('href')
+    console.log(userLink)
     const splittedLink = userLink.split('/')
     return splittedLink[splittedLink.length - 1]
   } catch (e) {
@@ -56,7 +60,9 @@ const getMatchIdsFromDg = async (uid, event) => {
       .each((i, e) => {
         matchIds.push($(e).attr('href'))
       })
-    matchIds = matchIds.map(x => x.split('/')[3])
+    matchIds = matchIds
+      .map(x => x.split('/'))
+      .map(x => x[x.length - 3])
     return matchIds.length
       ? matchIds
       : `Error: No matches for ${uid} and ${event}`

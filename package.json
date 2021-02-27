@@ -52,6 +52,7 @@
   "devDependencies": {
     "cross-env": "^7.0.2",
     "eslint-plugin-jest": "^24.1.0",
+    "nock": "^13.0.9",
     "nodemon": "^2.0.4",
     "supertest": "^6.1.1"
   },
