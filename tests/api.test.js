@@ -43,15 +43,15 @@ describe('Players router', () => {
 
   describe('POST - /players', () => {
     it('adds a new player to the DB if only the username is specified', async () => {
-      /*const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGuserlist-oregammon.html'))
+      const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGuserlist-oregammon.html'))
       nock('http://dailygammon.com')
         .post('/bg/plist?like=oregammon&type=name')
-        .reply(200, mockedResponse)*/
+        .reply(200, mockedResponse)
 
       const res = await request
         .post('/players')
         .send({ username: 'oregammon' })
-        .expect(200)
+        .expect(200) // As create and update are handled with the same query, 200 is returned from both if the operation is successful
         .expect('Content-Type', /application\/json/)
 
       expect(res.body.user_id).toBe(16278)
@@ -63,10 +63,15 @@ describe('Players router', () => {
     })
 
     it('adds a new player to the DB if a username, a password and an email address are specified', async () => {
+      const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGuserlist-institute.html'))
+      nock('http://dailygammon.com')
+        .post('/bg/plist?like=institute&type=name')
+        .reply(200, mockedResponse)
+
       const res = await request
         .post('/players')
         .send({ username: 'institute', password: '123456', email: 'institute@gmail.com' })
-        .expect(200)
+        .expect(200) // As create and update are handled with the same query, 200 is returned from both if the operation is successful
         .expect('Content-Type', /application\/json/)
 
       expect(res.body.user_id).toBe(19228)
@@ -78,6 +83,11 @@ describe('Players router', () => {
     })
 
     it('updates an existing user if username, password and an email address are specified', async () => {
+      const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGuserlist-Uforobban.html'))
+      nock('http://dailygammon.com')
+        .post('/bg/plist?like=Uforobban&type=name')
+        .reply(200, mockedResponse)
+
       const res = await request
         .post('/players')
         .send({ username: 'Uforobban', password: 'abcdefg', email: 'uforobban@gmail.com' })
@@ -103,6 +113,11 @@ describe('Players router', () => {
     })
 
     it('returns 400 and a message if the username does not exists in DailyGammon', async () => {
+      const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGuserlist-nonexistinguser.html'))
+      nock('http://dailygammon.com')
+        .post('/bg/plist?like=nonexistinguser&type=name')
+        .reply(200, mockedResponse)
+
       const res = await request
         .post('/players')
         .send({ username: 'nonexistinguser' })

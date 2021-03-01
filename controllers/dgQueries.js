@@ -17,22 +17,19 @@ const getPlayerIdFromDg = async (username) => {
       url,
       headers: header
     })
-    console.log(response.data)
+
+    let userLink
     const $ = cheerio.load(response.data)
-    const userLinks = $('[href^=\'/bg/user/\']')
-    console.log(userLinks)
-    if (userLinks.length !== 1) {
-      if (!userLinks.length) {
-        console.log('No userlinks')
-        return `There is no user: ${username}`
-      } else {
-        console.warn(
-          `There are more than 1 results for ${username} the first one is taken`
-        )
-      }
+    $('a').each((i, el) => {
+      if($(el).text() === username)
+        userLink = $(el).attr('href')
+    })
+
+    if(!userLink) {
+      console.log('No userlink')
+      return `There is no user: ${username}`
     }
-    const userLink = userLinks.attr('href')
-    console.log(userLink)
+
     const splittedLink = userLink.split('/')
     return splittedLink[splittedLink.length - 1]
   } catch (e) {
