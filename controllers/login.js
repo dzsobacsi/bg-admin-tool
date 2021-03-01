@@ -22,7 +22,7 @@ loginRouter.post('/', async (req, res) => {
 
     if (!user || !passwordCorrect) {
       return res.status(401).json({
-        error: 'invalid username or password'
+        message: 'Error: Invalid username or password'
       })
     }
 

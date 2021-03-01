@@ -392,6 +392,56 @@ describe('Matches router', () => {
   })
 })
 
+// LOGIN
+
+describe('Login router', () => {
+  describe('POST - /login', () => {
+    beforeAll(async () => {
+      const mockedResponse = fs.readFileSync(path.resolve(__dirname, './mockedResults/DGuserlist-asdasd.html'))
+      nock('http://dailygammon.com')
+        .post('/bg/plist?like=asdasd&type=name')
+        .reply(200, mockedResponse)
+
+      await request
+        .post('/players')
+        .send({ username: 'asdasd', password: '12345678', email: 'asdasd@gmail.com' })
+    })
+
+    it('is possible to log in if correct username and password are specified', async () => {
+      const res = await request
+        .post('/login')
+        .send({ username: 'asdasd', password: '12345678' })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toMatchObject({
+        username: 'asdasd',
+        userid: 24172
+      })
+    })
+
+    it('returns 401 and a message if wrong password is specified', async () => {
+      const res = await request
+        .post('/login')
+        .send({ username: 'asdasd', password: '123456' })
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body.message).toBe('Error: Invalid username or password')
+    })
+
+    it('returns 401 and a message if wrong username is specified', async () => {
+      const res = await request
+        .post('/login')
+        .send({ username: 'asd', password: '12345678' })
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body.message).toBe('Error: Invalid username or password')
+    })
+  })
+})
+
 afterAll(async () => {
   await pool.end()
 })
