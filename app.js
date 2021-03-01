@@ -23,8 +23,4 @@ app.use('/matches', matchesRouter)
 app.use('/groups', groupsRouter)
 app.use('/login', loginRouter)
 
-app.get('/ping', (req, res) => {
-  res.send('pong')
-})
-
 module.exports = app
