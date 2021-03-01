@@ -25,10 +25,8 @@ const getPlayerIdFromDg = async (username) => {
         userLink = $(el).attr('href')
     })
 
-    if(!userLink) {
-      console.log('No userlink')
+    if(!userLink)
       return `There is no user: ${username}`
-    }
 
     const splittedLink = userLink.split('/')
     return splittedLink[splittedLink.length - 1]
