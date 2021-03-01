@@ -27,7 +27,7 @@ groupsRouter.post('/', async (req, res) => {
       }
       if(winner && !winnerId) {
         res.status(400)
-        res.send({ message: 'Error: Cannot update the group with the given winner. nonexistinguser does not exist in the database.' })
+        res.send({ message: `Error: Cannot update the group with the given winner. ${winner} does not exist in the database.` })
         res.end()
       } else {
         const groups = await client.query(`
