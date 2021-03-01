@@ -1,11 +1,11 @@
 import dbService from './services'
 
-export const sortGroups = (a, b) =>
+const sortGroups = (a, b) =>
   b.season - a.season || a.groupname.localeCompare(b.groupname)
 
 // takes an array of userNames
 // returns an array of userIds from the database
-export const getPlayerIds = async userNames => {
+const getPlayerIds = async userNames => {
   const playerIdPromises = userNames.map(uname => dbService.getUser(uname))
   const players = await Promise.all(playerIdPromises)
   return players.map(p => p.data.user_id)
@@ -13,21 +13,21 @@ export const getPlayerIds = async userNames => {
 
 // takes an array of userNames
 // return an array of userNames which are not available in the DB
-export const missingPlayersFrom = async playerNames => {
+const missingPlayersFrom = async playerNames => {
   const playerIds = await getPlayerIds(playerNames)
   return playerNames.filter((pn, i) => !playerIds[i])
 }
 
 // takes a username
 // retrurns true if it is an administrator and false otherwise
-export const isAdministrator = async username => {
+const isAdministrator = async username => {
   const user = await dbService.getUser(username)
   return user.data.administrator
 }
 
 // takes a list of matchIDs
 // returns a list of match results from DG
-export const getMatchResultsFromDg = async matchIds => {
+const getMatchResultsFromDg = async matchIds => {
   const matchResultPromises = matchIds
     .map(mid => dbService.getMatchResult(mid))
   return await Promise.all(matchResultPromises)
@@ -38,7 +38,7 @@ export const getMatchResultsFromDg = async matchIds => {
 // - reversed: false
 // - userIds: [] (list of 2 userIds)
 // this way the object becomes ready to be saved to the DB
-export const processResultObjects = async results => {
+const processResultObjects = async results => {
   const playersSet = new Set()
   results.forEach(m => {
     playersSet.add(m.playerNames[0])
@@ -62,7 +62,7 @@ export const processResultObjects = async results => {
 
 // takes a processed match result object
 // returns the same object with reversed playerNames, playerIds and score
-export const swapResult = result => {
+const swapResult = result => {
   const newRes = { ...result }
   newRes.playerNames.reverse()
   newRes.playerIds.reverse()
@@ -74,7 +74,7 @@ export const swapResult = result => {
 // takes an array of processed results
 // checks for duplicates and swaps them
 // returns the same array with no duplicates
-export const handleDuplicates = results => {
+const handleDuplicates = results => {
   const seen = []
   results.forEach((r, i) => {
     if (seen.includes(JSON.stringify(r.playerIds))) {
@@ -95,7 +95,7 @@ also have another match with each other. Their order is replaced`)
 // returns an array of matchIds
 // returns all matchIds of all users having matches with the given groupname
 // used only by NewGroupForm
-export const getMatchIds = async (playerIds, groupName) => {
+const getMatchIds = async (playerIds, groupName) => {
   const matchIdPromises = playerIds
     .map(pid => dbService.getMatchIds(pid, groupName))
   let matchIds = await Promise.all(matchIdPromises) // the result here is a 2D array
@@ -106,7 +106,7 @@ export const getMatchIds = async (playerIds, groupName) => {
 
 // takes an array of usernames
 // saves them to the DB, and returns the server response
-export const registerPlayers = async playerNames => {
+const registerPlayers = async playerNames => {
   const registerPromises = playerNames
     .map(pl => dbService.register({ username: pl }))
   return await Promise.all(registerPromises)
@@ -114,7 +114,7 @@ export const registerPlayers = async playerNames => {
 
 // takes an array of processed results and a group name
 // saves them to the DB and returns the server response
-export const saveMatchesToDb = async (results, groupName) => {
+const saveMatchesToDb = async (results, groupName) => {
   const saveRequestPromises = results
     .map(r => dbService.saveResultToDb(r, groupName))
   return await Promise.all(saveRequestPromises)
@@ -123,7 +123,22 @@ export const saveMatchesToDb = async (results, groupName) => {
 // takes a groupname
 // returns a season number in Int if the begining of the gpname is a number
 // returns null otherwise
-export const seasonFromGroupName = gpname => {
+const seasonFromGroupName = gpname => {
   const season = parseInt(gpname.substring(0,2))
   return season ? season : null
+}
+
+export default {
+  sortGroups,
+  getPlayerIds,
+  missingPlayersFrom,
+  isAdministrator,
+  getMatchResultsFromDg,
+  processResultObjects,
+  swapResult,
+  handleDuplicates,
+  getMatchIds,
+  registerPlayers,
+  saveMatchesToDb,
+  seasonFromGroupName,
 }
