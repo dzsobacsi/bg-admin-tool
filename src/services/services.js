@@ -19,8 +19,9 @@ const getUser = async (username) => {
   const url = encodeUrl(baseUrl + `/players/${username}`)
   try {
     const response = await axios.get(url)
-    return response
+    return response.data
   } catch (e) {
+    console.error('getUser err')
     console.error(e.message)
   }
 }

@@ -8,7 +8,7 @@ const sortGroups = (a, b) =>
 const getPlayerIds = async userNames => {
   const playerIdPromises = userNames.map(uname => dbService.getUser(uname))
   const players = await Promise.all(playerIdPromises)
-  return players.map(p => p.data.user_id)
+  return players.map(p => p.user_id)
 }
 
 // takes an array of userNames
@@ -22,7 +22,7 @@ const missingPlayersFrom = async playerNames => {
 // retrurns true if it is an administrator and false otherwise
 const isAdministrator = async username => {
   const user = await dbService.getUser(username)
-  return user.data.administrator
+  return user.administrator
 }
 
 // takes a list of matchIDs
