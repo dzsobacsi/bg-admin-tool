@@ -12,7 +12,7 @@ const getPlayerIds = async userNames => {
 }
 
 // takes an array of userNames
-// return an array of userNames which are not available in the DB
+// returns an array of userNames which are not available in the DB
 const missingPlayersFrom = async playerNames => {
   const playerIds = await getPlayerIds(playerNames)
   return playerNames.filter((pn, i) => !playerIds[i])
