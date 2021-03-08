@@ -30,7 +30,7 @@ describe('Players router', () => {
       expect(res.body).toEqual(expect.objectContaining({
         user_id: 1070,
         username: 'oldehippy',
-        administrator: false
+        administrator: true
       }))
     })
 
