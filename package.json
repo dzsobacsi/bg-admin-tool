@@ -18,7 +18,8 @@
   },
   "scripts": {
     "start": "node server",
-    "dev:server": "cross-env NODE_ENV=development nodemon server.js",
+    "dev:server":  "cross-env NODE_ENV=development nodemon server.js",
+    "test:server": "cross-env NODE_ENV=test        nodemon server.js",
     "test": "cross-env NODE_ENV=test jest api.test.js --runInBand",
     "eslint": "eslint ."
   },

@@ -12,6 +12,11 @@ beforeAll(async () => {
   await initDatabase()
 })
 
+afterAll(async () => {
+  await initDatabase()
+  await pool.end()
+})
+
 // PLAYERS
 
 describe('Players router', () => {
@@ -440,8 +445,4 @@ describe('Login router', () => {
       expect(res.body.message).toBe('Error: Invalid username or password')
     })
   })
-})
-
-afterAll(async () => {
-  await pool.end()
 })
