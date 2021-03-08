@@ -1,7 +1,7 @@
 import React from 'react'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
-import dbService from '../services/services'
+import { saveGroupToDb, getGroupMatches } from '../services/services'
 import {
   getMatchResultsFromDg,
   processResultObjects,
@@ -38,7 +38,7 @@ const AddByBatchForm = ({
       `Do you want to save the group ${groupName} and ${results.length} matches to the database?`
     )) {
       // save the new group to the database
-      const addedGroup = await dbService.saveGroupToDb({
+      const addedGroup = await saveGroupToDb({
         groupname: groupName,
         season: seasonFromGroupName(groupName),
       })
@@ -48,7 +48,7 @@ const AddByBatchForm = ({
       const savedMatchResults = await saveMatchesToDb(results, groupName)
       console.log(savedMatchResults)
 
-      const matches = await dbService.getGroupMatches(groupName)
+      const matches = await getGroupMatches(groupName)
       setMatches(matches)
       setGroups([...groups, addedGroup])
       setSelectedGroup(groupName)

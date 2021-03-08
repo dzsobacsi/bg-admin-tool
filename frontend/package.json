@@ -1,0 +1,44 @@
+{
+  "name": "bg-admin-tool-frontend",
+  "version": "0.2.0",
+  "private": true,
+  "dependencies": {
+    "axios": "^0.21.1",
+    "bootstrap": "^4.5.2",
+    "encodeurl": "^1.0.2",
+    "react": "^16.13.1",
+    "react-bootstrap": "^1.3.0",
+    "react-dom": "^16.13.1",
+    "react-scripts": "^4.0.1"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=development PORT=3001 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "test:helpers": "cross-env NODE_ENV=test jest helperfunctions.test.js --runInBand",
+    "eject": "react-scripts eject",
+    "eslint": "eslint ."
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2",
+    "eslint-plugin-jest": "^24.1.0",
+    "nock": "^13.0.9",
+    "supertest": "^6.1.1"
+  },
+  "proxy": "http://localhost:3000"
+}

@@ -1,11 +1,11 @@
 import React from 'react'
-import dbService from '../services/services'
+import { getGroupMatches } from '../services/services'
 
 const Group = ({
   group, setMatches, setSelectedGroup, setUpdatedMatches, setLastUpdate
 }) => {
   const openGroupResults = async () => {
-    const matches = await dbService.getGroupMatches(group.groupname)
+    const matches = await getGroupMatches(group.groupname)
     const niceDate = new Date(matches[0].lastupdate).toString()
 
     setUpdatedMatches([])

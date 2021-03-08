@@ -1,7 +1,7 @@
 import React from 'react'
 import Button from 'react-bootstrap/Button'
 import TextInput from './TextInput'
-import dbService from '../services/services'
+import { saveGroupToDb, getGroupMatches } from '../services/services'
 import {
   getPlayerIds,
   missingPlayersFrom,
@@ -70,7 +70,7 @@ ${results.length} out of ${expectedNrOfMatches} matches were found.
 Do you want to save the results to the database?`
     )) {
       // save the new group to the database
-      const addedGroup = await dbService.saveGroupToDb({
+      const addedGroup = await saveGroupToDb({
         groupname: groupName,
         season: seasonFromGroupName(groupName),
       })
@@ -80,7 +80,7 @@ Do you want to save the results to the database?`
       const savedMatchResults = await saveMatchesToDb(results, groupName)
       console.log(savedMatchResults)
 
-      const matches = await dbService.getGroupMatches(groupName)
+      const matches = await getGroupMatches(groupName)
       setMatches(matches)
       setGroups([...groups, addedGroup])
       setSelectedGroup(groupName)

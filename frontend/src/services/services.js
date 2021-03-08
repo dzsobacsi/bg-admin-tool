@@ -5,7 +5,7 @@ const baseUrl = process.env.NODE_ENV === 'development'
   ? 'http://localhost:3000'
   : ''
 
-const getGroups = async () => {
+export const getGroups = async () => {
   try {
     const response = await axios.get(baseUrl + '/groups')
     return response.data
@@ -15,7 +15,7 @@ const getGroups = async () => {
   }
 }
 
-const getUser = async (username) => {
+export const getUser = async (username) => {
   const url = encodeUrl(baseUrl + `/players/${username}`)
   try {
     const response = await axios.get(url)
@@ -26,7 +26,7 @@ const getUser = async (username) => {
   }
 }
 
-const getMatchIds = async (uid, event) => {
+export const getMatchIds = async (uid, event) => {
   let url = encodeUrl(baseUrl + `/matches/matchids?uid=${uid}&event=${event}`)
   try {
     const response = await axios.get(url)
@@ -38,7 +38,7 @@ const getMatchIds = async (uid, event) => {
 }
 
 // mid can be either a string or an int
-const getMatchResult = async (mid) => {
+export const getMatchResult = async (mid) => {
   let url = baseUrl + `/matches/${mid}`
   try {
     const response = await axios.get(url)
@@ -50,7 +50,7 @@ const getMatchResult = async (mid) => {
 }
 
 // get matches of a given group from the database
-const getGroupMatches = async groupname => {
+export const getGroupMatches = async groupname => {
   const url = encodeUrl(baseUrl + `/matches?groupname=${groupname}`)
   try {
     const response = await axios.get(url)
@@ -69,7 +69,7 @@ const getGroupMatches = async groupname => {
   finished
   reversed
 }*/
-const saveResultToDb = async (mr, groupname) => {
+export const saveResultToDb = async (mr, groupname) => {
   const url = baseUrl + '/matches'
   const data = {
     match_id: mr.mid,
@@ -92,7 +92,7 @@ const saveResultToDb = async (mr, groupname) => {
 }
 
 // takes a group object with properties: finished, groupname, season, winner
-const saveGroupToDb = async group => {
+export const saveGroupToDb = async group => {
   const url = baseUrl + '/groups'
   try {
     const response = await axios.post(url, group)
@@ -103,7 +103,7 @@ const saveGroupToDb = async group => {
   }
 }
 
-const register = async (user) => {
+export const register = async (user) => {
   // takes a user object { username*, password, email }
   const url = baseUrl + '/players'
   try {
@@ -112,15 +112,4 @@ const register = async (user) => {
   } catch (e) {
     console.error(e.message)
   }
-}
-
-export default {
-  getGroups,
-  getUser,
-  getMatchIds,
-  getMatchResult,
-  saveResultToDb,
-  getGroupMatches,
-  saveGroupToDb,
-  register,
 }

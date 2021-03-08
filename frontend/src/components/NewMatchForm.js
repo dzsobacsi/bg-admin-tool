@@ -2,7 +2,7 @@ import React from 'react'
 import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
-import dbService from '../services/services'
+import { saveResultToDb, getGroupMatches } from '../services/services'
 import {
   getMatchResultsFromDg,
   processResultObjects,
@@ -37,8 +37,8 @@ const NewMatchForm = ({
     if (matchResult.playerNames[0] && window.confirm(`Do you really want to save the match
 ${JSON.stringify(matchResult)}
 to the database?`)) {
-      const savedResult = await dbService.saveResultToDb(matchResult, selectedGroup)
-      const matchesFromDb = await dbService.getGroupMatches(selectedGroup)
+      const savedResult = await saveResultToDb(matchResult, selectedGroup)
+      const matchesFromDb = await getGroupMatches(selectedGroup)
 
       setMatches(matchesFromDb)
       setFormVisible('')

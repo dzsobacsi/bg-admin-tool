@@ -4,7 +4,7 @@ const baseUrl = process.env.NODE_ENV === 'development'
   ? 'http://localhost:3000'
   : ''
 
-const login = async (user) => {
+export const loginService = async (user) => {
   const url = baseUrl + '/login'
   try {
     const response = await axios.post(url, user)
@@ -13,5 +13,3 @@ const login = async (user) => {
     console.error(e.message)
   }
 }
-
-export default { login }

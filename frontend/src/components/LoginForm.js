@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import RegisterForm from './RegisterForm'
-import loginService from '../services/login'
+import { loginService } from '../services/login'
 
 const LoginForm = ({ loggedInUser, setLoggedInUser, setNotifMessage }) => {
   const [registerVisble, setRegisterVisible] = useState(false)
@@ -16,7 +16,7 @@ const LoginForm = ({ loggedInUser, setLoggedInUser, setNotifMessage }) => {
       username: e.target.username.value,
       password: e.target.password.value,
     }
-    const loginResponse = await loginService.login(user)
+    const loginResponse = await loginService(user)
     if (loginResponse) {
       const user = loginResponse.data
       window.localStorage.setItem('token', user.token)

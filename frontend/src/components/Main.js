@@ -7,7 +7,7 @@ import AddByBatchForm from './AddByBatchForm'
 import Results from './Results'
 import Summary from './Summary'
 import Filter from './Filter'
-import dbService from '../services/services'
+import { getGroups, getGroupMatches, saveGroupToDb } from '../services/services'
 import {
   getMatchResultsFromDg,
   processResultObjects,
@@ -29,7 +29,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
   // Groups are loaded from the server and notifmessage is set.
   // Only once when the component is mounted
   useEffect(() => {
-    dbService.getGroups().then(g => setGroups(g))
+    getGroups().then(g => setGroups(g))
     setNotifMessage('Ready')
   }, [setNotifMessage])
 
@@ -76,7 +76,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
     const savedMatchResults = await saveMatchesToDb(results, selectedGroup)
     console.log('saved results: ', savedMatchResults)
 
-    const nextStateMatches = await dbService.getGroupMatches(selectedGroup)
+    const nextStateMatches = await getGroupMatches(selectedGroup)
 
     // Check if all the matches are finished
     // and update the group table if they are
@@ -91,7 +91,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
       updatedGroup.finished = true
     }
 
-    const savedGroup = await dbService.saveGroupToDb(updatedGroup)
+    const savedGroup = await saveGroupToDb(updatedGroup)
     console.log('savedGroup: ', savedGroup)
 
     const nextStateGroups = groups

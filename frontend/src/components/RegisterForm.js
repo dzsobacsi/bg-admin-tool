@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
-import dbService from '../services/services'
+import { getUser, register } from '../services/services'
 
 const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
   const [warningText, setWarningText] = useState('')
@@ -36,14 +36,14 @@ const RegisterForm = ({ toggleRegisterVisible, setNotifMessage }) => {
     } else {
 
       //Check if the user is already registered
-      const userFromDb = await dbService.getUser(user.username)
+      const userFromDb = await getUser(user.username)
       if (userFromDb.data.registered) {
         setWarningText('You already registered. Please, log in.')
         setTimeout(() => setWarningText(''), 4000)
       } else {
 
         // if everything is OK
-        const addedUser = await dbService.register(user)
+        const addedUser = await register(user)
         if (addedUser.data.user_id) {
           setNotifMessage(`${user.username} is now registered. Please, log in.`)
           toggleRegisterVisible()
