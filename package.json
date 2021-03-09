@@ -1,7 +1,12 @@
 {
   "name": "bg-admin-tool-server",
   "version": "0.2.0",
+  "description": "Backgammon results administration tool",
   "private": true,
+  "cacheDirectories": [
+    "node_modules",
+    "frontend/node_modules"
+  ],
   "dependencies": {
     "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
@@ -21,7 +26,8 @@
     "dev:server":  "cross-env NODE_ENV=development nodemon server.js",
     "test:server": "cross-env NODE_ENV=test        nodemon server.js",
     "test": "cross-env NODE_ENV=test jest api.test.js --runInBand",
-    "eslint": "eslint ."
+    "eslint": "eslint .",
+    "build": "cd frontend/ && npm install && npm run build"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
@@ -34,5 +40,10 @@
   "jest": {
     "testEnvironment": "node",
     "verbose": true
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dzsobacsi/bg-admin-tool.git"
   }
 }
