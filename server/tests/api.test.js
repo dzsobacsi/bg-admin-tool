@@ -355,6 +355,35 @@ describe('Matches router', () => {
       })
     })
 
+    it('adds a match to the database even if some of the scores are zero', async () => {
+      const res = await request
+        .post('/matches')
+        .send({
+          match_id: 5,
+          player1: 32684,
+          player2: 1070,
+          score1: 0,
+          score2: 0,
+          groupname: '17th champ L1',
+          finished: false,
+          addedbyuser: 1070,
+          reversed: false
+        })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      expect(res.body).toMatchObject({
+        match_id: 5,
+        player1: 32684,
+        player2: 1070,
+        score1: 0,
+        score2: 0,
+        groupid: 1,
+        finished: false,
+        addedbyuser: 1070,
+      })
+    })
+
     it('returns 400 and a message if match_id is not specified', async () => {
       await request
         .post('/matches')
