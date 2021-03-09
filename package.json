@@ -27,7 +27,8 @@
     "test:server": "cross-env NODE_ENV=test        nodemon server.js",
     "test": "cross-env NODE_ENV=test jest api.test.js --runInBand",
     "eslint": "eslint .",
-    "build": "cd frontend/ && npm install && npm run build"
+    "build": "cd frontend/ && npm install && npm run build",
+    "database": "heroku pg:psql postgresql-silhouetted-63008 --app bg-admin-tool"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
