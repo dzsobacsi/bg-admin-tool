@@ -8,7 +8,9 @@ export const sortGroups = (a, b) =>
 export const getPlayerIds = async userNames => {
   const playerIdPromises = userNames.map(uname => services.getUser(uname))
   const players = await Promise.all(playerIdPromises)
-  return players.map(p => p.user_id)
+  return players
+    .filter(p => p !== undefined)
+    .map(p => p.user_id)
 }
 
 // takes an array of userNames
@@ -22,7 +24,9 @@ export const missingPlayersFrom = async playerNames => {
 // retrurns true if it is an administrator and false otherwise
 export const isAdministrator = async username => {
   const user = await services.getUser(username)
-  return user.administrator
+  return user
+    ? user.administrator
+    : undefined
 }
 
 // takes a list of matchIDs

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import encodeUrl from 'encodeurl'
 
-const baseUrl = process.env.NODE_ENV === 'development'
+const baseUrl = ['development', 'test'].includes(process.env.NODE_ENV)
   ? 'http://localhost:3000'
   : ''
 
@@ -21,8 +21,7 @@ export const getUser = async (username) => {
     const response = await axios.get(url)
     return response.data
   } catch (e) {
-    console.error('getUser err')
-    console.error(e.message)
+    console.error(`getUser: ${e.message}`)
   }
 }
 
@@ -32,8 +31,7 @@ export const getMatchIds = async (uid, event) => {
     const response = await axios.get(url)
     return response.data
   } catch (e) {
-    console.error('getMatchIds err')
-    console.error(e.message)
+    console.error(`getMatchIds: ${e.message}`)
   }
 }
 
@@ -44,8 +42,7 @@ export const getMatchResult = async (mid) => {
     const response = await axios.get(url)
     return response.data
   } catch (e) {
-    console.error('getMatchResult err')
-    console.error(e.message)
+    console.error(`getMatchResult: ${e.message}`)
   }
 }
 
@@ -56,8 +53,7 @@ export const getGroupMatches = async groupname => {
     const response = await axios.get(url)
     return response.data
   } catch (e) {
-    console.error('getGroupMatches err')
-    console.error(e.message)
+    console.error(`getGroupMatches: ${e.message}`)
   }
 }
 
@@ -86,8 +82,7 @@ export const saveResultToDb = async (mr, groupname) => {
     const response = await axios.post(url, data)
     return response.data
   } catch (e) {
-    console.error('saveResultToDb err')
-    console.error(e.message)
+    console.error(`saveResultToDb: ${e.message}`)
   }
 }
 
@@ -98,8 +93,7 @@ export const saveGroupToDb = async group => {
     const response = await axios.post(url, group)
     return response.data
   } catch (e) {
-    console.error('saveNewGroupToDb err')
-    console.error(e.message)
+    console.error(`saveGroupToDb: ${e.message}`)
   }
 }
 
@@ -110,6 +104,6 @@ export const register = async (user) => {
     const response = await axios.post(url, user)
     return response.data
   } catch (e) {
-    console.error(e.message)
+    console.error(`register: ${e.message}`)
   }
 }
