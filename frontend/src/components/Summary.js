@@ -29,7 +29,7 @@ const Summary = ({ matches, setTopPlayer }) => {
   matches.forEach(m => {
     // Only if finihsed
     if (m.finished) {
-      const winner = m.score1 === 11 ? 0 : 1
+      const winner = m.score1 > m.score2 ? 0 : 1
       const ply = [m.player1, m.player2]
       summaryTable[m.player1].fin++
       summaryTable[m.player2].fin++
