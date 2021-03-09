@@ -41,16 +41,16 @@ export const getMatchResultsFromDg = async matchIds => {
 // - userIds: [] (list of 2 userIds)
 // this way the object becomes ready to be saved to the DB
 export const processResultObjects = async results => {
+  if(results.some(r => r === undefined)) {
+    console.error('The fetched results contain undefined items')
+    return false
+  }
   const playersSet = new Set()
   results.forEach(m => {
     playersSet.add(m.playerNames[0])
     playersSet.add(m.playerNames[1])
   })
   const userNames = [...playersSet]
-  if (userNames.some(un => typeof un === 'undefined')) {
-    console.error('The fetched results contain undefined usernames')
-    return false
-  }
 
   const playerIds = await getPlayerIds(userNames)
   const players = {}
