@@ -15,7 +15,7 @@ app.use(morgan('tiny', { skip: () => config.NODE_ENV === 'test' }))
 app.use(express.json())
 //app.use(favicon(__dirname + '/../frontend/public/favicon.ico'))
 // the __dirname is the current directory from where the script is running
-app.use(express.static(path.resolve('../frontend/build')))
+app.use(express.static(path.resolve(__dirname, '../frontend/build')))
 
 app.use('/players', playersRouter)
 app.use('/matches', matchesRouter)
