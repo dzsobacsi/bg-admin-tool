@@ -8,9 +8,7 @@ export const sortGroups = (a, b) =>
 export const getPlayerIds = async userNames => {
   const playerIdPromises = userNames.map(uname => services.getUser(uname))
   const players = await Promise.all(playerIdPromises)
-  return players
-    .filter(p => p !== undefined)
-    .map(p => p.user_id)
+  return players.map(p => p ? p.user_id : undefined)
 }
 
 // takes an array of userNames

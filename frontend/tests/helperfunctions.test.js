@@ -33,16 +33,18 @@ describe('Helper functions', () => {
       const result = await hlp.getPlayerIds([ 'oldehippy', 'Uforobban', 'PiT' ])
       expect(result).toEqual([ 1070, 33328, 32684 ])
     })
-    it('skips invalid usernames and returns a shorter array of user IDs', async () => {
+    it('keeps the length of the array, the IDs of invalid users are undefined', async () => {
       const result = await hlp.getPlayerIds([ 'oldehippy', 'Uforobban', 'nonexistinguser' ])
-      expect(result).toEqual([ 1070, 33328 ])
+      expect(result).toEqual([ 1070, 33328, undefined ])
     })
   })
 
   describe('missingPlayersFrom', () => {
     it('filters the usernames which are not present in the DB', async () => {
-      const result = await hlp.missingPlayersFrom([ 'oldehippy', 'Uforobban', 'missing1', 'missing2' ])
-      expect(result).toEqual([ 'missing1', 'missing2' ])
+      const result1 = await hlp.missingPlayersFrom([ 'oldehippy', 'Uforobban', 'missing1', 'missing2' ])
+      const result2 = await hlp.missingPlayersFrom([ 'Uforobban', 'missing1', 'missing2', 'PiT' ])
+      expect(result1).toEqual([ 'missing1', 'missing2' ])
+      expect(result2).toEqual([ 'missing1', 'missing2' ])
     })
   })
 
