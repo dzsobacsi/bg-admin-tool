@@ -27,7 +27,7 @@ const AddByBatchForm = ({
     console.log(matchIds)
 
     let results = await getMatchResultsFromDg(matchIds)
-    results = await processResultObjects(results)
+    results = await processResultObjects(results, true)
     if (!results) {
       setNotifMessage('Something went wrong. Please, try again.')
       return

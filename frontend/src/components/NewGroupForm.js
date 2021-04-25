@@ -46,7 +46,7 @@ const NewGroupForm = ({
     results = results.filter(
       r => userNames.includes(r.playerNames[0]) && userNames.includes(r.playerNames[1])
     )
-    results = await processResultObjects(results)
+    results = await processResultObjects(results, false)
     if (!results) {
       setNotifMessage('Something went wrong. Please, try again.')
       return

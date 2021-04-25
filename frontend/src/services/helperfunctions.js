@@ -40,7 +40,8 @@ export const getMatchResultsFromDg = async matchIds => {
 // - reversed: false
 // - userIds: [] (list of 2 userIds)
 // this way the object becomes ready to be saved to the DB
-export const processResultObjects = async results => {
+// If the second parameter is true, it also registers the missing players to the DB
+export const processResultObjects = async (results, shouldRegisterMissingPlayers = false) => {
   if(results.some(r => r === undefined)) {
     console.error('The fetched results contain undefined items')
     return false
@@ -51,6 +52,8 @@ export const processResultObjects = async results => {
     playersSet.add(m.playerNames[1])
   })
   const userNames = [...playersSet]
+  
+  if (shouldRegisterMissingPlayers) registerMissingPlayers(userNames)
 
   const playerIds = await getPlayerIds(userNames)
   const players = {}
