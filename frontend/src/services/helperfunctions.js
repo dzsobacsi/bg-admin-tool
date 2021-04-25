@@ -132,3 +132,12 @@ export const seasonFromGroupName = gpname => {
   const season = parseInt(gpname.substring(0,2))
   return season ? season : null
 }
+
+export const registerMissingPlayers = async playerNames => {
+  const missingPlayers = missingPlayersFrom(playerNames)
+  if (missingPlayers.length) {
+    const savedPlayers = await registerPlayers(missingPlayers)
+    console.log('The following players were saved to the database')
+    console.log(savedPlayers)
+  }
+}

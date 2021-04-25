@@ -4,8 +4,7 @@ import TextInput from './TextInput'
 import { saveGroupToDb, getGroupMatches } from '../services/services'
 import {
   getPlayerIds,
-  missingPlayersFrom,
-  registerPlayers,
+  registerMissingPlayers,
   getMatchIds,
   getMatchResultsFromDg,
   processResultObjects,
@@ -35,13 +34,7 @@ const NewGroupForm = ({
       .filter(i => i.length)
     console.log(userNames)
 
-    const missingPlayers = await missingPlayersFrom(userNames)
-    if (missingPlayers.length) {
-      const savedPlayers = await registerPlayers(missingPlayers)
-      console.log('The following players were saved to the database')
-      console.log(savedPlayers)
-    }
-
+    registerMissingPlayers(userNames)
     let playerIds = await getPlayerIds(userNames)
     console.log(playerIds)
 
