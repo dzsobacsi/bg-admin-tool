@@ -101,7 +101,10 @@ export const getMatchIds = async (playerIds, groupName) => {
   const matchIdPromises = playerIds
     .map(pid => services.getMatchIds(pid, groupName))
   let matchIds = await Promise.all(matchIdPromises) // the result here is a 2D array
-  matchIds = matchIds.map(x => x.matchIds).flat() // flat is not supported in IE
+  matchIds = matchIds
+    .filter(x => x !== undefined)
+    .map(x => x.matchIds)
+    .flat() // flat is not supported in IE
   matchIds = [...new Set(matchIds)] // to remove duplicates
   return matchIds
 }
