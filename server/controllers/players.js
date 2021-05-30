@@ -50,7 +50,6 @@ playersRouter.post('/', async (req, res) => {
 
 //get a player from the database
 playersRouter.get('/:username', async (req, res) => {
-  // Check if player is in the database
   const client = await pool.connect()
   try {
     const dbRespnse = await client.query(

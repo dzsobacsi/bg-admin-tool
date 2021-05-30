@@ -27,7 +27,7 @@ const AddByBatchForm = ({
     console.log(matchIds)
 
     let results = await getMatchResultsFromDg(matchIds)
-    results = await processResultObjects(results)
+    results = await processResultObjects(results, true)
     if (!results) {
       setNotifMessage('Something went wrong. Please, try again.')
       return
@@ -67,7 +67,7 @@ const AddByBatchForm = ({
       <Form onSubmit={addMatches}>
         <Form.Group>
           <Form.Row>
-            <p style={{ color: 'red' }}>Use this form as an alternative to Add Group. Delete existing group before submit!</p>
+            <p style={{ color: 'red' }}>Use this form as an alternative to "Add Group - player names". Add each Match IDs separately line-by-line. Delete existing group before submit!</p>
             <Form.Label column="lg" lg={8}>Group name</Form.Label>
             <Form.Control size="sm" name="groupname" />
           </Form.Row>

@@ -40,7 +40,8 @@ export const getMatchResultsFromDg = async matchIds => {
 // - reversed: false
 // - userIds: [] (list of 2 userIds)
 // this way the object becomes ready to be saved to the DB
-export const processResultObjects = async results => {
+// If the second parameter is true, it also registers the missing players to the DB
+export const processResultObjects = async (results, shouldRegisterMissingPlayers = false) => {
   if(results.some(r => r === undefined)) {
     console.error('The fetched results contain undefined items')
     return false
@@ -51,6 +52,8 @@ export const processResultObjects = async results => {
     playersSet.add(m.playerNames[1])
   })
   const userNames = [...playersSet]
+  
+  if (shouldRegisterMissingPlayers) registerMissingPlayers(userNames)
 
   const playerIds = await getPlayerIds(userNames)
   const players = {}
@@ -101,7 +104,10 @@ export const getMatchIds = async (playerIds, groupName) => {
   const matchIdPromises = playerIds
     .map(pid => services.getMatchIds(pid, groupName))
   let matchIds = await Promise.all(matchIdPromises) // the result here is a 2D array
-  matchIds = matchIds.map(x => x.matchIds).flat() // flat is not supported in IE
+  matchIds = matchIds
+    .filter(x => x !== undefined)
+    .map(x => x.matchIds)
+    .flat() // flat is not supported in IE
   matchIds = [...new Set(matchIds)] // to remove duplicates
   return matchIds
 }
@@ -128,4 +134,13 @@ export const saveMatchesToDb = async (results, groupName) => {
 export const seasonFromGroupName = gpname => {
   const season = parseInt(gpname.substring(0,2))
   return season ? season : null
+}
+
+export const registerMissingPlayers = async playerNames => {
+  const missingPlayers = missingPlayersFrom(playerNames)
+  if (missingPlayers.length) {
+    const savedPlayers = await registerPlayers(missingPlayers)
+    console.log('The following players were saved to the database')
+    console.log(savedPlayers)
+  }
 }
