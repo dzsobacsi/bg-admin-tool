@@ -10,7 +10,7 @@ the app automatically fetches the match results from DailyGammon.
 The cells of the bottom table are clickable and the links bring you to the
 corresponding match review page on DailyGammon.
 
-![screenshot](public/bg-admin-screen.png)
+![screenshot](frontend/public/bg-admin-screen.png)
 
 ## as a registered administrator
 
