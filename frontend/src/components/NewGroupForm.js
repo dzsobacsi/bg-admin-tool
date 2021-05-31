@@ -32,14 +32,14 @@ const NewGroupForm = ({
     const userNames = [...inputArray]
       .map(inp => inp.value)
       .filter(i => i.length)
-    console.log(userNames)
+    console.log('NewGroupForm - userNames: \n', userNames)
 
     registerMissingPlayers(userNames)
     let playerIds = await getPlayerIds(userNames)
-    console.log(playerIds)
+    console.log('NewGroupForm - playerIds: \n', playerIds)
 
     const matchIds = await getMatchIds(playerIds, groupName)
-    console.log(matchIds)
+    console.log('NewGroupForm - matchIds: \n', matchIds)
 
     //fetch match results
     let results = await getMatchResultsFromDg(matchIds)
