@@ -137,10 +137,10 @@ export const seasonFromGroupName = gpname => {
 }
 
 export const registerMissingPlayers = async playerNames => {
-  const missingPlayers = missingPlayersFrom(playerNames)
+  const missingPlayers = await missingPlayersFrom(playerNames)
   if (missingPlayers.length) {
     const savedPlayers = await registerPlayers(missingPlayers)
     console.log('The following players were saved to the database')
-    console.log(savedPlayers)
+    console.log('registerMissingPlayers - savedPlayers:\n', savedPlayers)
   }
 }
