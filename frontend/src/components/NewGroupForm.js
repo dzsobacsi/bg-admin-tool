@@ -34,7 +34,7 @@ const NewGroupForm = ({
       .filter(i => i.length)
     console.log('NewGroupForm - userNames: \n', userNames)
 
-    registerMissingPlayers(userNames)
+    await registerMissingPlayers(userNames)
     let playerIds = await getPlayerIds(userNames)
     console.log('NewGroupForm - playerIds: \n', playerIds)
 
