@@ -62,7 +62,7 @@ const Summary = ({ matches, setTopPlayer }) => {
   })
 
   let tableToRender = Object.values(summaryTable)
-    .sort((a, b) => b.won - a.won || b.totfin - a.totfin || b.totall - a.totall)
+    .sort((a, b) => b.won - a.won || b.totfin - a.totfin || b.plsfin - a.plsfin || b.totall - a.totall)
     .map(row => Object.values(row))
     .map(row => row.map(
       (data, i) => ({ value: data, class: i ? 'default' : 't-header' })
