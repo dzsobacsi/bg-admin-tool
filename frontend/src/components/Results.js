@@ -3,8 +3,8 @@ import TableRow from './TableRow'
 
 const Results = ({ matches, updatedMatches }) => {
   // matches come from the database and it has the keys:
-  // match_id, player1, player2, score1, score2, finished
-  // and players are strings with usernames
+  // match_id, player1, player2, score1, score2, finished, reversed, lastupdate
+  // where players are strings with usernames
 
   //create an array of players
   let playersSet = new Set()
@@ -38,7 +38,7 @@ const Results = ({ matches, updatedMatches }) => {
       value: `${m.score1} : ${m.score2}`,
       class: m.finished ? 'finished' : 'ongoing',
       mid: m.match_id,
-      link: `http://dailygammon.com/bg/game/${m.match_id}/0/list#end`
+      link: `http://dailygammon.com/bg/game/${m.match_id}/${m.reversed?1:0}/list#end`
     }
   })
 
