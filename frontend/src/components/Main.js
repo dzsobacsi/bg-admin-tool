@@ -25,6 +25,8 @@ const Main = ({ setNotifMessage, adminMode }) => {
   const [groupFilter, setGroupFilter] = useState('')
   const [updatedMatches, setUpdatedMatches] = useState([])
   const [lastUpdate, setLastUpdate] = useState('')
+  const currentTime = new Date()
+  const endOfSeason = new Date(2023, 0, 7, 21)  // Jan = 0, Dec = 11
 
   // Groups are loaded from the server and notifmessage is set.
   // Only once when the component is mounted
@@ -35,6 +37,11 @@ const Main = ({ setNotifMessage, adminMode }) => {
 
   const refreshResults = async () => {
     setNotifMessage('Please wait...')
+  
+    if(currentTime > endOfSeason) {
+      setNotifMessage('The season is already ended. Final result tables are to be published soon.')
+      return
+    }
 
     // match IDs of unfinised matches are:
     const unfinishedMatches = matches
