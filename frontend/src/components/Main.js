@@ -206,6 +206,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
             <Summary matches={matches} setTopPlayer={setTopPlayer}/>
             <Results matches={matches} updatedMatches={updatedMatches}/>
             <span id="lastupdate">Last update: {lastUpdate}</span><br/>
+            <br/>
             <Button
               variant='outline-success'
               onClick={refreshResults}
