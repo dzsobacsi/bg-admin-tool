@@ -2,6 +2,9 @@
   "name": "bg-admin-tool-server",
   "version": "0.2.0",
   "description": "Backgammon results administration tool",
+  "engines": {
+    "node": "16.x"
+  },
   "private": true,
   "cacheDirectories": [
     "node_modules",
