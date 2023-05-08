@@ -7,7 +7,7 @@ import AddByBatchForm from './AddByBatchForm'
 import Results from './Results'
 import Summary from './Summary'
 import Filter from './Filter'
-import { getGroups, getGroupMatches, saveGroupToDb } from '../services/services'
+import { getGroups, getGroupMatches, saveGroupToDb, getDate } from '../services/services'
 import {
   getMatchResultsFromDg,
   processResultObjects,
@@ -25,7 +25,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
   const [groupFilter, setGroupFilter] = useState('')
   const [updatedMatches, setUpdatedMatches] = useState([])
   const [lastUpdate, setLastUpdate] = useState('')
-  //const endOfSeason = new Date(2023, 3, 22, 20)  // Y, M, D, hh, UTC, Jan = 0, Dec = 11
+  const endOfSeason = new Date(2023, 6, 29, 20)  // Y, M, D, hh, UTC, Jan = 0, Dec = 11
 
   // Groups are loaded from the server and notifmessage is set.
   // Only once when the component is mounted
@@ -35,11 +35,14 @@ const Main = ({ setNotifMessage, adminMode }) => {
   }, [setNotifMessage])
 
   const refreshResults = async () => {
-    /*const currentTime = new Date()
-    if(currentTime > endOfSeason) {
+    const serverTime = await getDate()
+    console.log('serverTime: ', serverTime)
+    console.log('endOfSeason: ', endOfSeason)
+    console.log('season is already ended? ', serverTime > endOfSeason)
+    if(true || serverTime > endOfSeason) {
       setNotifMessage('The season is already ended. Final result tables are to be published soon.')
       return
-    }*/
+    }
 
     setNotifMessage('Please wait...')
 
