@@ -107,3 +107,13 @@ export const register = async (user) => {
     console.error(`register: ${e.message}`)
   }
 }
+
+export const getDate = async () => {
+  const url = baseUrl + '/date'
+  try {
+    const response = await axios.get(url)
+    return response.data
+  } catch (e) {
+    console.error(`getDate: ${e.message}`)
+  }
+}
