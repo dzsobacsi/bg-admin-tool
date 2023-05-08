@@ -35,11 +35,12 @@ const Main = ({ setNotifMessage, adminMode }) => {
   }, [setNotifMessage])
 
   const refreshResults = async () => {
-    const serverTime = await getDate()
+    const serverTimeStr = await getDate()
+    const serverTime = new Date(serverTimeStr)
     console.log('serverTime: ', serverTime)
     console.log('endOfSeason: ', endOfSeason)
     console.log('season is already ended? ', serverTime > endOfSeason)
-    if(true || serverTime > endOfSeason) {
+    if(serverTime > endOfSeason) {
       setNotifMessage('The season is already ended. Final result tables are to be published soon.')
       return
     }
