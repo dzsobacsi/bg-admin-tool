@@ -8,6 +8,7 @@ const playersRouter = require('./controllers/players')
 const matchesRouter = require('./controllers/matches')
 const groupsRouter = require('./controllers/groups')
 const loginRouter = require('./controllers/login')
+const dateRouter = require('./controllers/date')
 
 const app = express()
 app.use(cors())
@@ -21,5 +22,6 @@ app.use('/players', playersRouter)
 app.use('/matches', matchesRouter)
 app.use('/groups', groupsRouter)
 app.use('/login', loginRouter)
+app.use('/date', dateRouter)
 
 module.exports = app
