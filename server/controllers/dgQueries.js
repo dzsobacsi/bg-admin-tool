@@ -68,11 +68,13 @@ const getMatchIdsFromDg = async (uid, event) => {
 }
 
 const getMatchResultFromDg = async (mid) => {
-  // Takes a match_id, returns an object like
-  // mid: match_id,
-  // players: an array of the 2 player names (as their username)
-  // finished: boolean - true if the match is finished
-  // score: an array of 2 integers as the match score
+  // Takes a match_id, returns an object like:
+  //  {
+  //    mid: match_id,
+  //    players: [username1, username2],
+  //    finished: Boolean,
+  //    score: [score1, score2]
+  //  }
   const url = baseUrl + `/bg/game/${mid}/0/list`
   try {
     const response = await axios({
