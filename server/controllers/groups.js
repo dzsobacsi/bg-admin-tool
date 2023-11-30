@@ -1,5 +1,6 @@
 const groupsRouter = require('express').Router()
-const pool = require('../utils/db')
+//const pool = require('../utils/db')
+const client = require('../utils/gbq')
 
 // add a new group to the database
 // groupname and season are mandatory
@@ -50,20 +51,20 @@ groupsRouter.post('/', async (req, res) => {
 
 //get all groups from the database
 groupsRouter.get('/', async (req, res) => {
-  const client = await pool.connect()
+  const options = {query:
+    `SELECT gp.groupname, gp.finished, gp.season, gp.lastupdate, pl.username AS winner
+    FROM backgammon.groups AS gp
+    LEFT JOIN backgammon.players AS pl
+    ON gp.winner = pl.user_id`
+  }
   try {
-    const groups = await client.query(
-      `SELECT gp.groupname, gp.finished, gp.season, gp.lastupdate, pl.username AS winner
-      FROM groups AS gp
-      LEFT JOIN players AS pl
-      ON gp.winner = pl.user_id`
-    )
-    res.json(groups.rows)
-  } catch (e) {
-    console.error('An error is catched in groupsRouter.get/groupnames')
+    const [job] = await client.createQueryJob(options)
+    const [rows] = await job.getQueryResults()
+    res.json(rows)
+  }
+  catch (e) {
+    console.error('An error is catched in groupsRouter.get/')
     console.error(e.message)
-  } finally {
-    client.release()
   }
 })
 

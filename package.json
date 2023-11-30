@@ -11,6 +11,7 @@
     "frontend/node_modules"
   ],
   "dependencies": {
+    "@google-cloud/bigquery": "^7.3.0",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
     "cheerio": "^1.0.0-rc.3",
@@ -26,7 +27,7 @@
   },
   "scripts": {
     "start": "node server",
-    "dev:server":  "cross-env NODE_ENV=development nodemon server.js",
+    "dev:server": "cross-env NODE_ENV=development nodemon server.js",
     "test:server": "cross-env NODE_ENV=test        nodemon server.js",
     "test": "cross-env NODE_ENV=test jest api.test.js --runInBand",
     "eslint": "eslint .",

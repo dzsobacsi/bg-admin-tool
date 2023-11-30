@@ -1,6 +1,7 @@
 const matchesRouter = require('express').Router()
 const dgQueries = require('./dgQueries')
-const pool = require('../utils/db')
+//const pool = require('../utils/db')
+const client = require('../utils/gbq')
 
 //add a match to the database
 // takes the group name as a string but saves it as its ID (fk)
@@ -51,32 +52,35 @@ matchesRouter.post('/', async (req, res) => {
 //get matches of a given group from the database
 matchesRouter.get('/', async (req, res) => {
   const group = req.query.groupname
-  const client = await pool.connect()
-  try {
-    const matches = await client.query(`
-      SELECT mt.match_id, p1.username AS player1, p2.username AS player2,
+  //const client = await pool.connect()
+  const options = {
+    query:
+      `SELECT mt.match_id, p1.username AS player1, p2.username AS player2,
         mt.score1, mt.score2, mt.finished, mt.reversed, gp.lastupdate
-      FROM matches AS mt
-      LEFT JOIN players p1
+      FROM backgammon.matches AS mt
+      LEFT JOIN backgammon.players p1
       ON mt.player1 = p1.user_id
-      LEFT JOIN players p2
+      LEFT JOIN backgammon.players p2
       ON mt.player2 = p2.user_id
-      LEFT JOIN groups gp
+      LEFT JOIN backgammon.groups gp
       ON mt.groupid = gp.groupid
-      WHERE gp.groupname = $1
-    `, [group])
-    if(matches.rows.length)
-      res.json(matches.rows)
+      WHERE gp.groupname = @group`,
+    params: { group }
+  }
+  try {
+    const [job] = await client.createQueryJob(options)
+    const [rows] = await job.getQueryResults()
+    if(rows.length)
+      res.json(rows)
     else {
       res.status(404)
       res.json({ message: `Error: There are no matches in the database in group ${group}` })
     }
     res.end()
-  } catch (e) {
-    console.error('An error is catched in groupsRouter.get/matches')
+  }
+  catch (e) {
+    console.error('An error is catched in matchesRouter.get/')
     console.error(e.message)
-  } finally {
-    client.release()
   }
 })
 
