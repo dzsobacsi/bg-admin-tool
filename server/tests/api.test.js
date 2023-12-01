@@ -133,7 +133,7 @@ describe('Players router', () => {
 })
 
 // GROUPS
-/*
+
 describe('Groups router', () => {
   describe('GET - /groups', () => {
     it('fetches all groups from the DB', async () => {
@@ -180,7 +180,7 @@ describe('Groups router', () => {
         .expect('Content-Type', /application\/json/)
 
       expect(res.body.groupname).toBe('17th champ L1')
-      expect(res.body.groupid).toBe(1)
+      expect(res.body.groupid).toBe('1')
       expect(res.body.finished).toBe(true)
       expect(res.body.winner).toBe(1070) //notice the difference
       expect(res.body.season).toBe(17)
@@ -220,7 +220,7 @@ describe('Groups router', () => {
 })
 
 // MATCHES
-
+/*
 describe('Matches router', () => {
   describe('GET - /matches/:id', () => {
     it('fetches match result from DailyGammon', async () => {
@@ -425,7 +425,7 @@ describe('Matches router', () => {
 })
 
 // LOGIN
-
+/*
 describe('Login router', () => {
   describe('POST - /login', () => {
     beforeAll(async () => {

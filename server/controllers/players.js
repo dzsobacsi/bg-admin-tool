@@ -52,7 +52,9 @@ playersRouter.post('/', async (req, res) => {
                 source.email,
                 source.registeredwhen
               );
-            SELECT * FROM \`${PROJECTID}.${DATASET}.players\` WHERE user_id = @user_id;`,
+
+            SELECT * FROM \`${PROJECTID}.${DATASET}.players\`
+            WHERE user_id = @user_id;`,
           params: {
             user_id: parseInt(user_id),
             username,
