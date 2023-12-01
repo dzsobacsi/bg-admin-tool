@@ -52,7 +52,6 @@ matchesRouter.post('/', async (req, res) => {
 //get matches of a given group from the database
 matchesRouter.get('/', async (req, res) => {
   const group = req.query.groupname
-  //const client = await pool.connect()
   const options = {
     query:
       `SELECT mt.match_id, p1.username AS player1, p2.username AS player2,

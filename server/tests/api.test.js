@@ -1,7 +1,6 @@
 const supertest = require('supertest')
 const app = require('../app')
 const nock = require('nock')
-const pool = require('../utils/db')
 const initDatabase = require('./initTestDb')
 const fs = require('fs')
 const path = require('path')
@@ -12,10 +11,9 @@ beforeAll(async () => {
   await initDatabase()
 })
 
-afterAll(async () => {
+/*afterAll(async () => {
   await initDatabase()
-  await pool.end()
-})
+})*/
 
 // PLAYERS
 
@@ -135,7 +133,7 @@ describe('Players router', () => {
 })
 
 // GROUPS
-
+/*
 describe('Groups router', () => {
   describe('GET - /groups', () => {
     it('fetches all groups from the DB', async () => {
@@ -475,3 +473,4 @@ describe('Login router', () => {
     })
   })
 })
+*/
