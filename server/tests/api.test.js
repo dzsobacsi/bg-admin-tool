@@ -220,7 +220,7 @@ describe('Groups router', () => {
 })
 
 // MATCHES
-/*
+
 describe('Matches router', () => {
   describe('GET - /matches/:id', () => {
     it('fetches match result from DailyGammon', async () => {
@@ -347,7 +347,7 @@ describe('Matches router', () => {
         player2: 1070,
         score1: 11,
         score2: 10,
-        groupid: 1,
+        groupid: '1',
         finished: true,
         addedbyuser: 1070,
       })
@@ -376,7 +376,7 @@ describe('Matches router', () => {
         player2: 1070,
         score1: 0,
         score2: 0,
-        groupid: 1,
+        groupid: '1',
         finished: false,
         addedbyuser: 1070,
       })

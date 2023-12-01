@@ -1,13 +1,11 @@
 const matchesRouter = require('express').Router()
 const dgQueries = require('./dgQueries')
-//const pool = require('../utils/db')
 const client = require('../utils/gbq')
+const { DATASET, PROJECTID } = require('../utils/config')
 
 //add a match to the database
 // takes the group name as a string but saves it as its ID (fk)
 matchesRouter.post('/', async (req, res) => {
-  const client = await pool.connect()
-
   try {
     const {
       match_id,
@@ -26,26 +24,73 @@ matchesRouter.post('/', async (req, res) => {
     ) {
       res.status(400)
       res.json({ message: 'Error: Could not save the match to the database. Some of the required paramaters are missing' })
-    } else {
-      const newMatch = await client.query(
-        `INSERT INTO matches (match_id, player1, player2, score1, score2, groupid,
-          finished, addedwhen, addedbyuser, reversed)
-        SELECT $1, $2, $3, $4, $5, gp.groupid, $7, NOW(), $8, $9
-        FROM groups AS gp
-        WHERE gp.groupname = $6
-        ON CONFLICT (match_id) DO UPDATE
-        SET score1 = $4, score2 = $5, finished = $7
-        RETURNING *`,
-        [match_id, player1, player2, score1, score2, groupname, finished, addedbyuser, reversed]
-      )
-      res.json(newMatch.rows[0])
+    }
+    else {
+      const options = {
+        query:
+          `MERGE INTO \`${PROJECTID}.${DATASET}.matches\` AS target
+          USING (
+            SELECT
+              @match_id AS match_id,
+              @player1 AS player1,
+              @player2 AS player2,
+              @score1 AS score1,
+              @score2 AS score2,
+              gp.groupid AS groupid,
+              @finished AS finished,
+              CURRENT_TIMESTAMP() AS addedwhen,
+              @addedbyuser AS addedbyuser,
+              @reversed AS reversed
+            FROM \`${PROJECTID}.${DATASET}.groups\` AS gp
+            WHERE gp.groupname = @groupname
+          ) AS source
+          ON target.match_id = source.match_id
+          WHEN MATCHED THEN
+            UPDATE SET
+              score1 = @score1,
+              score2 = @score2,
+              finished = @finished
+          WHEN NOT MATCHED THEN
+            INSERT (
+              match_id,
+              player1,
+              player2,
+              score1,
+              score2,
+              groupid,
+              finished,
+              addedwhen,
+              addedbyuser,
+              reversed
+            )
+            VALUES(
+              source.match_id,
+              source.player1,
+              source.player2,
+              source.score1,
+              source.score2,
+              source.groupid,
+              source.finished,
+              source.addedwhen,
+              source.addedbyuser,
+              source.reversed
+            );
+
+            SELECT * FROM \`${PROJECTID}.${DATASET}.matches\`
+            WHERE match_id = @match_id;`,
+        params: {
+          match_id, player1, player2, score1, score2, groupname, finished, addedbyuser, reversed
+        }
+      }
+      const [job] = await client.createQueryJob(options)
+      const [rows] = await job.getQueryResults()
+      res.json(rows[0])
     }
     res.end()
-  } catch (e) {
+  }
+  catch (e) {
     console.error('An error is catched in matchesRouter.post')
     console.error(e.message)
-  } finally {
-    client.release()
   }
 })
 
@@ -56,12 +101,12 @@ matchesRouter.get('/', async (req, res) => {
     query:
       `SELECT mt.match_id, p1.username AS player1, p2.username AS player2,
         mt.score1, mt.score2, mt.finished, mt.reversed, gp.lastupdate
-      FROM backgammon.matches AS mt
-      LEFT JOIN backgammon.players p1
+      FROM \`${PROJECTID}.${DATASET}.matches\` AS mt
+      LEFT JOIN \`${PROJECTID}.${DATASET}.players\` p1
       ON mt.player1 = p1.user_id
-      LEFT JOIN backgammon.players p2
+      LEFT JOIN \`${PROJECTID}.${DATASET}.players\` p2
       ON mt.player2 = p2.user_id
-      LEFT JOIN backgammon.groups gp
+      LEFT JOIN \`${PROJECTID}.${DATASET}.groups\` gp
       ON mt.groupid = gp.groupid
       WHERE gp.groupname = @group`,
     params: { group }
