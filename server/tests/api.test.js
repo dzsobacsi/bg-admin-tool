@@ -425,7 +425,7 @@ describe('Matches router', () => {
 })
 
 // LOGIN
-/*
+
 describe('Login router', () => {
   describe('POST - /login', () => {
     beforeAll(async () => {
@@ -473,4 +473,3 @@ describe('Login router', () => {
     })
   })
 })
-*/

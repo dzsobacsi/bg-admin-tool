@@ -1,20 +1,21 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const pool = require('../utils/db')
 const loginRouter = require('express').Router()
-const config = require('../utils/config')
+const client = require('../utils/gbq')
+const { JWT_SECRET, PROJECTID, DATASET } = require('../utils/config')
 
 loginRouter.post('/', async (req, res) => {
   const { username, password } = req.body
-  const client = await pool.connect()
   try {
-    let user = await client.query(
-      `SELECT * FROM players
-      WHERE username = $1`,
-      [username]
-    )
-    user = user.rows[0]
-    //console.log('user: ', user)
+    const options = {
+      query:
+        `SELECT * FROM \`${PROJECTID}.${DATASET}.players\`
+        WHERE username = @username`,
+      params: { username }
+    }
+    const [job] = await client.createQueryJob(options)
+    const [rows] = await job.getQueryResults()
+    user = rows[0]
 
     const passwordCorrect = !user
       ? false
@@ -30,14 +31,13 @@ loginRouter.post('/', async (req, res) => {
       username: user.username
     }
 
-    const token = jwt.sign(userForToken, config.SECRET)
+    const token = jwt.sign(userForToken, JWT_SECRET)
 
     res.status(200).send({ token, username: user.username, userid: user.user_id })
-  } catch (e) {
+  }
+  catch (e) {
     console.error('Login router error')
     console.error(e.message)
-  } finally {
-    client.release()
   }
 })
 
