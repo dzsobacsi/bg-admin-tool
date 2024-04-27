@@ -14,10 +14,15 @@ const GroupTable = ({
         </tr>
       </thead>
       <tbody>
-        {groups
-          .filter(g => g.groupname
-            .toLowerCase()
-            .includes(groupFilter.toLowerCase()))
+        {groups.filter(
+            g => g.groupname
+              .toLowerCase()
+              .includes(groupFilter.toLowerCase()) 
+            || 
+            g.players
+              .map(p => p.toLowerCase())
+              .some(p => p.includes(groupFilter.toLowerCase()))
+          )
           .sort(sortGroups)
           .map((g, i) => <Group
             key={i}
