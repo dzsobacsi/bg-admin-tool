@@ -53,12 +53,37 @@ groupsRouter.get('/', async (req, res) => {
   const client = await pool.connect()
   try {
     const groups = await client.query(
-      `SELECT gp.groupname, gp.finished, gp.season, gp.lastupdate, pl.username AS winner
-      FROM groups AS gp
-      LEFT JOIN players AS pl
-      ON gp.winner = pl.user_id`
+      `select distinct 
+        g.groupname,
+        g.finished,
+        g.season,
+        g.lastupdate,
+        w.username as winner,
+        p.username as players
+      from
+        "groups" g
+      join matches m on g.groupid = m.groupid 
+      join players p on m.player1 = p.user_id
+      left join players w on g.winner = w.user_id 
+      order by g.groupname `
     )
-    res.json(groups.rows)
+    const result = []
+    groups.rows.forEach(group => {
+      const existingGroup = result.find(g => g.groupname === group.groupname)
+      if(existingGroup) {
+        existingGroup.players.push(group.players)
+      } else {
+        result.push({
+          groupname: group.groupname,
+          finished: group.finished,
+          season: group.season,
+          lastupdate: group.lastupdate,
+          winner: group.winner,
+          players: [group.players]
+        })
+      }
+    })
+    res.json(result)
   } catch (e) {
     console.error('An error is catched in groupsRouter.get/groupnames')
     console.error(e.message)
