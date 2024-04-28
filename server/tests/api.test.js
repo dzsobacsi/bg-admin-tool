@@ -330,7 +330,7 @@ describe('Matches router', () => {
       const res = await request
         .post('/matches')
         .send({
-          match_id: 4,
+          match_id: 91,
           player1: 33328,
           player2: 1070,
           score1: 11,
@@ -344,7 +344,7 @@ describe('Matches router', () => {
         .expect('Content-Type', /application\/json/)
 
       expect(res.body).toMatchObject({
-        match_id: 4,
+        match_id: 91,
         player1: 33328,
         player2: 1070,
         score1: 11,
@@ -359,7 +359,7 @@ describe('Matches router', () => {
       const res = await request
         .post('/matches')
         .send({
-          match_id: 5,
+          match_id: 92,
           player1: 32684,
           player2: 1070,
           score1: 0,
@@ -373,7 +373,7 @@ describe('Matches router', () => {
         .expect('Content-Type', /application\/json/)
 
       expect(res.body).toMatchObject({
-        match_id: 5,
+        match_id: 92,
         player1: 32684,
         player2: 1070,
         score1: 0,
@@ -408,7 +408,7 @@ describe('Matches router', () => {
       await request
         .post('/matches')
         .send({
-          match_id: 4,
+          match_id: 93,
           player1: 33328,
           player2: 1070,
           score1: 11,

@@ -14,6 +14,9 @@ const initDatabase = async () => {
     INSERT INTO matches (match_id, player1, player2, score1, score2, finished, groupid, reversed) VALUES (1, 1070, 33328, 7, 8, false, 1, false);
     INSERT INTO matches (match_id, player1, player2, score1, score2, finished, groupid, reversed) VALUES (2, 32684, 33328, 11, 8, true, 1, false);
     INSERT INTO matches (match_id, player1, player2, score1, score2, finished, groupid, reversed) VALUES (3, 1070, 32684, 7, 11, true, 1, false);
+    INSERT INTO matches (match_id, player1, player2, score1, score2, finished, groupid, reversed) VALUES (4, 1070, 33328, 7, 8, false, 2, false);
+    INSERT INTO matches (match_id, player1, player2, score1, score2, finished, groupid, reversed) VALUES (5, 32684, 33328, 11, 8, true, 2, false);
+    INSERT INTO matches (match_id, player1, player2, score1, score2, finished, groupid, reversed) VALUES (6, 1070, 32684, 7, 11, true, 2, false);
   `)
   client.release()
 }
