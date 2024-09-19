@@ -208,6 +208,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
           <>
             <h3>{selectedGroup}</h3>
             <Summary matches={matches} setTopPlayer={setTopPlayer}/>
+            <br/>
             <Results matches={matches} updatedMatches={updatedMatches}/>
             <span id="lastupdate">Last update: {lastUpdate}</span><br/>
             <br/>
