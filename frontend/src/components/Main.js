@@ -25,7 +25,7 @@ const Main = ({ setNotifMessage, adminMode }) => {
   const [groupFilter, setGroupFilter] = useState('')
   const [updatedMatches, setUpdatedMatches] = useState([])
   const [lastUpdate, setLastUpdate] = useState('')
-  const endOfSeason = new Date(Date.UTC(2025, 6, 19, 20))  // Y, M-1, D, hh, UTC, | Jan = 0, Dec = 11 | hh = Summer time: 20, Winter time: 21
+  const endOfSeason = new Date(Date.UTC(2025, 10, 8, 21))  // Y, M-1, D, hh, UTC, | Jan = 0, Dec = 11 | hh = Summer time: 20, Winter time: 21
 
   // Groups are loaded from the server and notifmessage is set.
   // Only once when the component is mounted
