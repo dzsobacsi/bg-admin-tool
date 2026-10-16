@@ -2,7 +2,7 @@
   "name": "bg-admin-tool-frontend",
   "version": "0.2.0",
   "engines": {
-    "node": "16.x"
+    "node": "24.x"
   },
   "private": true,
   "type": "module",
@@ -16,10 +16,10 @@
     "react-scripts": "^4.0.1"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development PORT=3001 react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "test:helpers": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest helperfunctions.test.js --runInBand",
+    "start": "cross-env NODE_ENV=development PORT=3001 NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
+    "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts test",
+    "test:helpers": "cross-env NODE_ENV=test NODE_OPTIONS=\"--openssl-legacy-provider --experimental-vm-modules\" jest helperfunctions.test.js --runInBand",
     "eject": "react-scripts eject",
     "eslint": "eslint ."
   },

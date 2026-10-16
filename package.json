@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "Backgammon results administration tool",
   "engines": {
-    "node": "16.x"
+    "node": "24.x"
   },
   "private": true,
   "cacheDirectories": [
@@ -12,7 +12,7 @@
   ],
   "dependencies": {
     "axios": "^0.21.1",
-    "bcrypt": "^5.0.0",
+    "bcrypt": "^6.0.0",
     "cheerio": "^1.0.0-rc.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
